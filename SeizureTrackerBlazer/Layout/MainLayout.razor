@@ -1,0 +1,22 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject NavigationManager Navigation
+
+<LoginDisplay/>
+
+@Body
+
+@code
+{
+    [Inject] AuthenticationStateProvider AuthStateProvider { get; set; }
+    
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && !user.Identity.IsAuthenticated)
+            Navigation.NavigateToLogin("authentication/login");
+    }
+}
