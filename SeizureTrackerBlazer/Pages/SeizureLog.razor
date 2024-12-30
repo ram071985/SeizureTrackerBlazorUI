@@ -5,7 +5,7 @@
 
 <PageTitle>Seizure Log</PageTitle>
 <div class="container flex py-5">
-    <form class="row justify-content-center">
+    <EditForm class="row justify-content-center" EditContext="_editContext" OnValidSubmit="submit" FormName="SeizureLog">
         <div class="col-md-3">
             <label>Date of seizure</label>
             <input type="date" class="form-control" placeholder="Enter date">
@@ -19,34 +19,78 @@
             <input type="text" class="form-control" placeholder="Enter seizure intensity value">
         </div>
         <div class="col-4 py-4">
-            <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+            <select onchange="@(() => onSeizureTypeSelectChange)" class="form-select form-select mb-3" aria-label="Enter multiple seizure types">
                 <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+                @foreach (string type in StateContainer.SeizureType)
+                {
+                    <option value="@type">@type</option>
+                }
             </select>
-            <span class="badge rounded-pill text-bg-info">Info</span>
+            @foreach (var type in _seizureTypesSelected)
+            {
+                <span class="badge rounded-pill text-bg-info">@type</span>
+            }
+          
         </div>
         <div class="col-md-4">
             <button type="submit" class="btn btn-primary btn-lg">Submit</button>
         </div>
-    </form>
+    </EditForm>
 </div>
 
 @code
 {
     private bool _showMultiSelect;
     private string _multiSelectText;
+    private EditContext? _editContext;
+    private ValidationMessageStore _messageStore;
+    private List<string> _seizureTypesSelected;
+
+    [SupplyParameterFromForm] private SeizureLog Model { get; set; }
+
 
     protected override void OnInitialized()
     {
-        StateContainer
+        Model ??= new();
+        _editContext = new(Model);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _messageStore = new(_editContext);
+        StateContainer.OnChange += StateHasChanged;
         _multiSelectText = UIConstants.MultiSelectShowText;
+        _seizureTypesSelected = new();
+    }
+
+    internal void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+
+        // Custom validation logic
+        // if (!Model!?.Options)
+        // {
+        //     _messageStore?.Add(() => Model.Options, "Select at least one.");
+        // }
+    }
+
+    public void Dispose()
+    {
+        StateContainer.OnChange -= StateHasChanged;
     }
 
     internal void showMultiSelect()
     {
         _showMultiSelect = !_showMultiSelect;
         _multiSelectText = !_showMultiSelect ? UIConstants.MultiSelectShowText : UIConstants.MultiSelectHideText;
+    }
+
+    private void submit()
+    {
+        
+    }
+
+    private void onSeizureTypeSelectChange(string seizureType)
+    {
+        _seizureTypesSelected.Add(seizureType);
+        
+        StateHasChanged();
     }
 }
