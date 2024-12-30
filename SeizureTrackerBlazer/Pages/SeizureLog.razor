@@ -1,5 +1,6 @@
 ﻿@page "/"
 @attribute [Authorize]
+@inject StateContainer StateContainer
 
 
 <PageTitle>Seizure Log</PageTitle>
@@ -37,8 +38,9 @@
     private bool _showMultiSelect;
     private string _multiSelectText;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        StateContainer
         _multiSelectText = UIConstants.MultiSelectShowText;
     }
 

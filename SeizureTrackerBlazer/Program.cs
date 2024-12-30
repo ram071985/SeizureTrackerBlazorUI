@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SeizureTrackerBlazer;
+using SeizureTrackerBlazer.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -15,6 +16,8 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.DefaultAccessTokenScopes
         .Add("api://20129ded-8b40-4c7d-ab9e-1f4fc8b959b0/Seizure.Records.Read.All");
 });
+
+builder.Services.AddSingleton<StateContainer>();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
