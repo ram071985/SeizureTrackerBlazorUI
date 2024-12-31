@@ -8,22 +8,28 @@
     <EditForm EditContext="@_editContext" class="row justify-content-center" OnValidSubmit="submit"
               FormName="SeizureLog">
         <div class="col-md-3">
-            <label>Date of seizure</label>
-            <input type="date" class="form-control" placeholder="Enter date">
+            <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Date"
+                            LabelText="@InputLabels.DateOfSeizure"
+                            @bind-value="@Model!.SeizureDate"
+            />
         </div>
         <div class="col-md-3">
-            <InputComponent InputType="@InputTypes.Time" LabelText="@InputLabels.TimeOfSeizure"
-                            @bind-value="@Model!.SeizureType"
-                            PlaceHolder="@PLaceHolderLabels.TimeOfDay"  OnInputCallback="@OnInputCallback"/>
+            <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Time"
+                            LabelText="@InputLabels.TimeOfSeizure"
+                            @bind-value="@Model!.SeizureTime"/>
         </div>
         <div class="col-md-3">
-            <label>Intensity</label>
-            <input type="text" class="form-control" placeholder="Enter seizure intensity value">
+            <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Number"
+                            LabelText="@InputLabels.Intensity"
+                            @bind-value="@Model!.SeizureIntensity" PlaceHolder="@PlaceHolderLabels.Intensity"/>
         </div>
         <div class="col-4 py-4">
+            <InputComponent SelectItems="@StateContainer.SeizureType" OptionLabel="@OptionLabels.SeizureType"
+                            InputType="@InputTypes.Select" LabelText="@AriaLabels.SeizureType"
+                            @bind-value="@Model!.SeizureType"/>
             <select onchange="@onSeizureTypeSelectChange" class="form-select form-select mb-3"
                     aria-label="Enter multiple seizure types">
-                <option selected>Open this select menu</option>
+                <option selected>Choose seizure type(s)</option>
                 @foreach (var type in StateContainer.SeizureType)
                 {
                     <option value="@_seizureTypeInput">@type</option>
@@ -49,7 +55,7 @@
     private ValidationMessageStore _messageStore;
     private List<string> _seizureTypesSelected;
 
-    [Parameter] public EventCallback<ChangeEventArgs> OnInputCallback { get; set; }
+    [Parameter] public EventCallback<string> OnInputCallback { get; set; }
     [SupplyParameterFromForm] private SeizureLogForm? Model { get; set; }
 
 
@@ -94,6 +100,5 @@
 
     private void onInput(ChangeEventArgs e)
     {
-        
     }
 }

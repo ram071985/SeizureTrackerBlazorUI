@@ -21,6 +21,13 @@ namespace SeizureTrackerBlazer.Constants
 
     internal static class InputTypes
     {
+        internal const string Input = "Input";
+        internal const string Checkbox = "Checkbox";
+        internal const string Select = "Select";
+    }
+
+    internal static class InputDataTypes
+    {
         internal const string Text = "text";
         internal const string Date = "date";
         internal const string Time = "time";
@@ -37,8 +44,19 @@ namespace SeizureTrackerBlazer.Constants
         
     }
 
-    internal static class PLaceHolderLabels
+    internal static class PlaceHolderLabels
     {
-        internal const string TimeOfDay = "Enter time";
+        internal const string Intensity = "e.g. 10 = strong, 1 = light";
+        internal const string KetonesLevel = "e.g. 3.5";
+    }
+
+    internal static class AriaLabels
+    {
+        internal const string SeizureType = "Enter multiple seizure types";
+    }
+
+    internal static class OptionLabels
+    {
+        internal const string SeizureType = "Enter 1 or more types";
     }
 };
