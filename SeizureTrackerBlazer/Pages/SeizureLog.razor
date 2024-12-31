@@ -5,32 +5,34 @@
 
 <PageTitle>Seizure Log</PageTitle>
 <div class="container flex py-5">
-    <EditForm class="row justify-content-center" EditContext="_editContext" OnValidSubmit="submit" FormName="SeizureLog">
+    <EditForm EditContext="@_editContext" class="row justify-content-center" OnValidSubmit="submit"
+              FormName="SeizureLog">
         <div class="col-md-3">
             <label>Date of seizure</label>
             <input type="date" class="form-control" placeholder="Enter date">
         </div>
         <div class="col-md-3">
-            <label>Time of seizure</label>
-            <input type="time" class="form-control" placeholder="Enter time">
+            <InputComponent InputType="@InputTypes.Time" LabelText="@InputLabels.TimeOfSeizure"
+                            @bind-value="@Model!.SeizureType"
+                            PlaceHolder="@PLaceHolderLabels.TimeOfDay"  OnInputCallback="@OnInputCallback"/>
         </div>
         <div class="col-md-3">
             <label>Intensity</label>
             <input type="text" class="form-control" placeholder="Enter seizure intensity value">
         </div>
         <div class="col-4 py-4">
-            <select onchange="@(() => onSeizureTypeSelectChange)" class="form-select form-select mb-3" aria-label="Enter multiple seizure types">
+            <select onchange="@onSeizureTypeSelectChange" class="form-select form-select mb-3"
+                    aria-label="Enter multiple seizure types">
                 <option selected>Open this select menu</option>
-                @foreach (string type in StateContainer.SeizureType)
+                @foreach (var type in StateContainer.SeizureType)
                 {
-                    <option value="@type">@type</option>
+                    <option value="@_seizureTypeInput">@type</option>
                 }
             </select>
             @foreach (var type in _seizureTypesSelected)
             {
                 <span class="badge rounded-pill text-bg-info">@type</span>
             }
-          
         </div>
         <div class="col-md-4">
             <button type="submit" class="btn btn-primary btn-lg">Submit</button>
@@ -42,11 +44,13 @@
 {
     private bool _showMultiSelect;
     private string _multiSelectText;
+    private string _seizureTypeInput;
     private EditContext? _editContext;
     private ValidationMessageStore _messageStore;
     private List<string> _seizureTypesSelected;
 
-    [SupplyParameterFromForm] private SeizureLog Model { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnInputCallback { get; set; }
+    [SupplyParameterFromForm] private SeizureLogForm? Model { get; set; }
 
 
     protected override void OnInitialized()
@@ -76,21 +80,20 @@
         StateContainer.OnChange -= StateHasChanged;
     }
 
-    internal void showMultiSelect()
-    {
-        _showMultiSelect = !_showMultiSelect;
-        _multiSelectText = !_showMultiSelect ? UIConstants.MultiSelectShowText : UIConstants.MultiSelectHideText;
-    }
 
     private void submit()
     {
-        
     }
 
-    private void onSeizureTypeSelectChange(string seizureType)
+    private void onSeizureTypeSelectChange(ChangeEventArgs e)
     {
-        _seizureTypesSelected.Add(seizureType);
-        
+        _seizureTypesSelected.Add(e.Value.ToString());
+
         StateHasChanged();
+    }
+
+    private void onInput(ChangeEventArgs e)
+    {
+        
     }
 }

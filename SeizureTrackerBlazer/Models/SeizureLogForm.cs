@@ -2,7 +2,7 @@
 
 namespace SeizureTrackerBlazer.Models
 {
-    public class SeizureLog
+    public class SeizureLogForm
     {
         public int Id { get; set; }
         public string SeizureDate { get; set; }
