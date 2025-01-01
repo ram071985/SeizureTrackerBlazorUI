@@ -1,4 +1,7 @@
 using SeizureTrackerBlazer.Constants;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components;
+using SeizureTrackerBlazer.Models;
 
 namespace SeizureTrackerBlazer.Services
 {
@@ -7,6 +10,7 @@ namespace SeizureTrackerBlazer.Services
         #region Private fields
 
         private List<string> _seizureTypes;
+        private EditContext? _editContext;
 
         #endregion
 
@@ -19,6 +23,19 @@ namespace SeizureTrackerBlazer.Services
         #region Properties
 
         public List<string> SeizureType => _seizureTypes;
+        
+        public EditContext? EditContext
+        {
+            get => _editContext;
+            set
+            {
+                if (value != _editContext)
+                {
+                    _editContext = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
 
         #endregion
 

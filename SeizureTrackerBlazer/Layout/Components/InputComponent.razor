@@ -1,17 +1,18 @@
+@using System.Net
 @using Microsoft.AspNetCore.Components
 @using SeizureTrackerBlazer.Services
 
 @switch (InputType)
 {
     case InputTypes.Select:
-        <select onchange="@onInput" class="form-select form-select mb-3"
+        <select onchange="@onChange" class="form-select form-select mb-3"
                 aria-label="@_labelText">
             <option selected>@_optionLabel</option>
             @if (_selectItems?.Any() == true)
             {
                 @foreach (var type in _selectItems)
                 {
-                    <option value="">@type</option>
+                    <option value="@type">@type</option>
                 }
             }
         </select>
@@ -38,7 +39,7 @@
     [Parameter] public string? LabelText { get; set; }
     [Parameter] public string? InputDataType { get; set; }
     [Parameter] public string? Value { get; set; }
-    [Parameter] public string? PlaceHolder { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
     [Parameter] public List<string>? SelectItems { get; set; }
     [Parameter] public string? OptionLabel { get; set; }
     [Parameter] public EventCallback<string> ValueChanged { get; set; }
@@ -53,15 +54,24 @@
         _labelText = LabelText;
         _inputType = InputType;
         _inputDataType = InputDataType;
-        _placeholder = PlaceHolder;
+        _placeholder = Placeholder;
         _selectItems = SelectItems;
         _optionLabel = OptionLabel;
+        _value = Value;
     }
 
-    private void onInput(ChangeEventArgs e)
+    private void onInput(ChangeEventArgs? e)
     {
         if (e?.Value?.ToString() == _value)
             return;
+
+        _value = e.Value.ToString();
+
+        ValueChanged.InvokeAsync(_value);
+    }
+
+    private void onChange(ChangeEventArgs? e)
+    {
         _value = e.Value.ToString();
 
         ValueChanged.InvokeAsync(_value);

@@ -44,7 +44,7 @@ namespace SeizureTrackerBlazer.Constants
         
     }
 
-    internal static class PlaceHolderLabels
+    internal static class PlaceholderLabels
     {
         internal const string Intensity = "e.g. 10 = strong, 1 = light";
         internal const string KetonesLevel = "e.g. 3.5";

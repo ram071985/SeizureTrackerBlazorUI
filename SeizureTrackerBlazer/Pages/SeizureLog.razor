@@ -21,23 +21,18 @@
         <div class="col-md-3">
             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Number"
                             LabelText="@InputLabels.Intensity"
-                            @bind-value="@Model!.SeizureIntensity" PlaceHolder="@PlaceHolderLabels.Intensity"/>
+                            @bind-value="@Model!.SeizureIntensity" Placeholder="@PlaceholderLabels.Intensity"/>
         </div>
-        <div class="col-4 py-4">
-            <InputComponent SelectItems="@StateContainer.SeizureType" OptionLabel="@OptionLabels.SeizureType"
+        <div class="col-md-4 py-4">
+            <InputComponent Value="@Model!.SeizureType" ValueChanged="onSeizureTypeSelectChange" SelectItems="@StateContainer.SeizureType"
+                            OptionLabel="@OptionLabels.SeizureType"
                             InputType="@InputTypes.Select" LabelText="@AriaLabels.SeizureType"
-                            @bind-value="@Model!.SeizureType"/>
-            <select onchange="@onSeizureTypeSelectChange" class="form-select form-select mb-3"
-                    aria-label="Enter multiple seizure types">
-                <option selected>Choose seizure type(s)</option>
-                @foreach (var type in StateContainer.SeizureType)
-                {
-                    <option value="@_seizureTypeInput">@type</option>
-                }
-            </select>
+            />
             @foreach (var type in _seizureTypesSelected)
             {
-                <span class="badge rounded-pill text-bg-info">@type</span>
+                <span class="badge rounded-pill text-bg-info align-items-center">@type<i onclick="@(() => removeSeizureType(type))"
+                                                                                         class="bi bi-x-circle-fill fs-6 ms-2"
+                                                                                         role="button"></i></span>
             }
         </div>
         <div class="col-md-4">
@@ -62,12 +57,20 @@
     protected override void OnInitialized()
     {
         Model ??= new();
-        _editContext = new(Model);
+        StateContainer.EditContext = new(Model);
         _editContext.OnValidationRequested += HandleValidationRequested;
         _messageStore = new(_editContext);
         StateContainer.OnChange += StateHasChanged;
         _multiSelectText = UIConstants.MultiSelectShowText;
         _seizureTypesSelected = new();
+    }
+
+    protected override void OnParametersSet()
+    {
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
     }
 
     internal void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
@@ -91,14 +94,20 @@
     {
     }
 
-    private void onSeizureTypeSelectChange(ChangeEventArgs e)
+    private void onSeizureTypeSelectChange(string value)
     {
-        _seizureTypesSelected.Add(e.Value.ToString());
+        _seizureTypesSelected.Add(value);
+        Model!.SeizureType = _seizureTypesSelected
 
         StateHasChanged();
     }
 
-    private void onInput(ChangeEventArgs e)
+    private void removeSeizureType(string type)
     {
+        var index = _seizureTypesSelected.IndexOf(type);
+        
+        _seizureTypesSelected.RemoveAt(index);
+        
+        StateHasChanged();
     }
 }
