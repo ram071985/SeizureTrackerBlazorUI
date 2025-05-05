@@ -24,16 +24,29 @@
                             @bind-value="@Model!.SeizureIntensity" Placeholder="@PlaceholderLabels.Intensity"/>
         </div>
         <div class="col-md-4 py-4">
-            <InputComponent Value="@Model!.SeizureType" ValueChanged="onSeizureTypeSelectChange" SelectItems="@StateContainer.SeizureType"
+            <InputComponent Value="@Model!.SeizureType" ValueChanged="onSeizureTypeSelectChange"
+                            SelectItems="@StateContainer.SeizureType"
                             OptionLabel="@OptionLabels.SeizureType"
                             InputType="@InputTypes.Select" LabelText="@AriaLabels.SeizureType"
             />
             @foreach (var type in _seizureTypesSelected)
             {
-                <span class="badge rounded-pill text-bg-info align-items-center">@type<i onclick="@(() => removeSeizureType(type))"
-                                                                                         class="bi bi-x-circle-fill fs-6 ms-2"
-                                                                                         role="button"></i></span>
+                <span class="badge rounded-pill text-bg-info align-items-center">@type<i
+                        onclick="@(() => removeSeizureType(type))"
+                        class="bi bi-x-circle-fill fs-6 ms-2"
+                        role="button"></i></span>
             }
+        </div>
+        <div class="col-md-3">
+            <InputSelect Value="@Model.MedicationChange"
+                         LabelText="@InputLabels.Intensity"
+                         @bind-value="@Model!.SeizureIntensity" Placeholder="@PlaceholderLabels.Intensity">
+                @foreach (var item in _medicationChangeSelectItems)
+                {
+                    <option value="@item">@item</option>
+                }
+            </InputSelect>
+        
         </div>
         <div class="col-md-4">
             <button type="submit" class="btn btn-primary btn-lg">Submit</button>
@@ -49,6 +62,7 @@
     private EditContext? _editContext;
     private ValidationMessageStore _messageStore;
     private List<string> _seizureTypesSelected;
+    private List<string> _medicationChangeSelectItems = new List<string>() {"Yes", "No"};
 
     [Parameter] public EventCallback<string> OnInputCallback { get; set; }
     [SupplyParameterFromForm] private SeizureLogForm? Model { get; set; }
@@ -58,6 +72,7 @@
     {
         Model ??= new();
         StateContainer.EditContext = new(Model);
+        _editContext = StateContainer.EditContext;
         _editContext.OnValidationRequested += HandleValidationRequested;
         _messageStore = new(_editContext);
         StateContainer.OnChange += StateHasChanged;
@@ -97,7 +112,7 @@
     private void onSeizureTypeSelectChange(string value)
     {
         _seizureTypesSelected.Add(value);
-        Model!.SeizureType = _seizureTypesSelected
+        //   Model!.SeizureType = _seizureTypesSelected
 
         StateHasChanged();
     }
@@ -105,9 +120,9 @@
     private void removeSeizureType(string type)
     {
         var index = _seizureTypesSelected.IndexOf(type);
-        
+
         _seizureTypesSelected.RemoveAt(index);
-        
+
         StateHasChanged();
     }
 }

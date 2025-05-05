@@ -11,6 +11,7 @@ namespace SeizureTrackerBlazer.Models
         public string KetonesLevel { get; set; }
         public string SeizureType { get; set; }
         public string SleepAmount { get; set; }
+        public string MedicationChange { get; set; }
         public string MedicationChangeExplanation { get; set; }
         public string Notes { get; set; }
     }
