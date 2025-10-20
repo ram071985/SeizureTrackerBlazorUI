@@ -5,6 +5,7 @@
 @switch (InputType)
 {
     case InputTypes.Select:
+        <label>@_labelText</label>
         <select onchange="@onChange" class="form-select form-select mb-3"
                 aria-label="@_labelText">
             <option selected>@_optionLabel</option>

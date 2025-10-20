@@ -1,3 +1,4 @@
+using System.Text.Json;
 using SeizureTrackerBlazer.Constants;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
@@ -11,6 +12,8 @@ namespace SeizureTrackerBlazer.Services
 
         private List<string> _seizureTypes;
         private EditContext? _editContext;
+        private List<string> _medicationChange;
+        private SeizureTrackerService _seizureTrackerService;
 
         #endregion
 
@@ -23,7 +26,8 @@ namespace SeizureTrackerBlazer.Services
         #region Properties
 
         public List<string> SeizureType => _seizureTypes;
-        
+        public List<string> MedicationChange => _medicationChange;
+
         public EditContext? EditContext
         {
             get => _editContext;
@@ -41,7 +45,7 @@ namespace SeizureTrackerBlazer.Services
 
         #region Construction
 
-        public StateContainer()
+        public StateContainer(IConfiguration config)
         {
             _seizureTypes = new List<string>
             {
@@ -55,6 +59,25 @@ namespace SeizureTrackerBlazer.Services
                 { SeizureTypes.Anxiety },
                 { SeizureTypes.MedicationChange }
             };
+
+            _medicationChange = new List<string>
+            {
+                { MedChange.Yes },
+                { MedChange.No },
+            };
+        }
+
+        public async Task AddSeizureActivityLog(SeizureActivityLog seizureActivityLog)
+        {
+            try
+            {
+                await _seizureTrackerService.AddSeizureActivityLog(JsonSerializer.Serialize(seizureActivityLog));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
         }
 
         #endregion

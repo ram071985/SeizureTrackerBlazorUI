@@ -6,6 +6,17 @@ namespace SeizureTrackerBlazer.Constants
         internal const string MultiSelectHideText = "Hide seizure types";
     }
 
+    internal static class AppSettings
+    {
+        internal const string SeizureTrackerAPIName = "APIName";
+    }
+
+    internal static class MedChange
+    {
+        internal const string Yes = "Yes";
+        internal const string No = "No";
+    }
+
     internal static class SeizureTypes
     {
         internal const string Partial = "Partial";
@@ -38,10 +49,11 @@ namespace SeizureTrackerBlazer.Constants
 
     internal static class InputLabels
     {
+        internal const string SeizureDescription = "Seizure Description";
         internal const string DateOfSeizure = "Date of seizure";
         internal const string TimeOfSeizure = "Time of seizure";
         internal const string Intensity = "Intensity";
-        
+        internal const string MedicationChange = "Medication Change";
     }
 
     internal static class PlaceholderLabels
@@ -58,5 +70,6 @@ namespace SeizureTrackerBlazer.Constants
     internal static class OptionLabels
     {
         internal const string SeizureType = "Enter 1 or more types";
+        internal const string MedChange = "Enter yes or no";
     }
 };
