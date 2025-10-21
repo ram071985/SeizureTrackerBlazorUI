@@ -21,7 +21,7 @@ public class SeizureTrackerService : ISeizureTrackerService
     {
         try
         {
-            await _client.PostAsync(_apiName, new StringContent(body));
+            await _client.PostAsync(_apiName, new StringContent(body, System.Text.Encoding.UTF8, "application/json"));
         }
         catch (Exception ex)
         {
