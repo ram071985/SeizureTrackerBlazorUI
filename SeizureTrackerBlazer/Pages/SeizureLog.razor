@@ -22,29 +22,30 @@
             />
         </div>
         <div class="col-md-3">
-            <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Time"
+            <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.DateTime"
                             LabelText="@InputLabels.TimeOfSeizure"
                             @bind-value="@Model!.SeizureTime"/>
+        </div>
+        <div class="col-md-4 py-4">
+            <InputComponent Value="@Model!.SeizureType" ValueChanged="onSeizureTypeSelectChange"
+                            SelectItems="@StateContainer.SeizureType"
+                            OptionLabel="@OptionLabels.SeizureType"
+                            InputType="@InputTypes.Select" LabelText="@AriaLabels.SeizureType"
+            />
+            @foreach (var type in _seizureTypesSelected)
+            {
+                <span class="badge rounded-pill text-bg-info align-items-center">@type<i
+                        onclick="@(() => removeSeizureType(type))"
+                        class="bi bi-x-circle-fill fs-6 ms-2"
+                        role="button"></i></span>
+            }
         </div>
         @* <div class="col-md-3"> *@
         @*     <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Number" *@
         @*                     LabelText="@InputLabels.Intensity" *@
         @*                     @bind-value="@Model!.SeizureIntensity" Placeholder="@PlaceholderLabels.Intensity"/> *@
         @* </div> *@
-        @* <div class="col-md-4 py-4"> *@
-        @*     <InputComponent Value="@Model!.SeizureType" ValueChanged="onSeizureTypeSelectChange" *@
-        @*                     SelectItems="@StateContainer.SeizureType" *@
-        @*                     OptionLabel="@OptionLabels.SeizureType" *@
-        @*                     InputType="@InputTypes.Select" LabelText="@AriaLabels.SeizureType" *@
-        @*     /> *@
-        @*     @foreach (var type in _seizureTypesSelected) *@
-        @*     { *@
-        @*         <span class="badge rounded-pill text-bg-info align-items-center">@type<i *@
-        @*                 onclick="@(() => removeSeizureType(type))" *@
-        @*                 class="bi bi-x-circle-fill fs-6 ms-2" *@
-        @*                 role="button"></i></span> *@
-        @*     } *@
-        @* </div> *@
+
         <div class="col-md-3">
             @* <InputComponent LabelText="@InputLabels.MedicationChange" *@
             @*                 SelectItems="@StateContainer.MedicationChange" *@
@@ -122,7 +123,8 @@
             var activityLog = new SeizureActivityLog
             {
                 SeizureDescription = Model?.SeizureDescription,
-                SeizureTime = Model?.SeizureTime
+                SeizureTime = Model?.SeizureTime,
+                SeizureType = Model?.SeizureType
             };
 
             await SeizureTrackerService.AddSeizureActivityLog(JsonSerializer.Serialize(activityLog));
@@ -130,7 +132,7 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            
+
             throw;
         }
     }
@@ -138,7 +140,8 @@
     private void onSeizureTypeSelectChange(string value)
     {
         _seizureTypesSelected.Add(value);
-        //   Model!.SeizureType = _seizureTypesSelected
+        
+        Model!.SeizureType = string.Join(",", _seizureTypesSelected);
 
         StateHasChanged();
     }

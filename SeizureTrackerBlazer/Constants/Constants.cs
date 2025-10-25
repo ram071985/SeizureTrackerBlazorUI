@@ -42,6 +42,7 @@ namespace SeizureTrackerBlazer.Constants
         internal const string Text = "text";
         internal const string Date = "date";
         internal const string Time = "time";
+        internal const string DateTime = "datetime-local";
         internal const string TextArea = "textarea";
         internal const string Email = "email";
         internal const string Number = "number";
