@@ -12,13 +12,13 @@
         <div class="col-md-3">
             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Text"
                             LabelText="@InputLabels.SeizureDescription"
-                            Value="@Model!.SeizureDescription"
+                            @bind-Value="@Model!.SeizureDescription"
             />
         </div>
         <div class="col-md-3">
             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.DateTime"
                             LabelText="@InputLabels.DateAndTime"
-                            Value="@Model!.SeizureDate"/>
+                            @bind-Value="@Model!.SeizureDate"/>
         </div>
         <div class="col-md-4 py-4">
             <InputComponent Value="@Model!.SeizureType" ValueChanged="OnSeizureTypeSelectChange"
@@ -49,14 +49,14 @@
                             DecimalStep="0.1"
                             DecimalMin="0.0"
                             DecimalMax="24.0"
-                            Value="@Model!.SleepAmount"/>
+                            @bind-Value="@Model!.SleepAmount"/>
         </div>
         <div class="col-md-3">
             <InputComponent LabelText="@InputLabels.MedicationChange"
                             SelectItems="@StateContainer.MedicationChange"
                             InputType="@InputTypes.Select"
                             OptionLabel="@OptionLabels.MedChange"
-                            Value="@Model!.MedicationChange"/>
+                            @bind-Value="@Model!.MedicationChange"/>
             @foreach (var item in _medicationChangeSelectItems)
             {
                 <option value="@item">@item</option>
@@ -66,13 +66,13 @@
             <InputComponent LabelText="@InputLabels.MedicationChangeDescription"
                             InputType="@InputTypes.Input"
                             InputDataType="@InputDataTypes.TextArea"
-                            Value="@Model!.MedicationChangeDescription"/>
+                            @bind-Value="@Model!.MedicationChangeDescription"/>
         </div>
         <div class="col-md-3">
             <InputComponent LabelText="@InputLabels.Notes"
                             InputType="@InputTypes.Input"
                             InputDataType="@InputDataTypes.TextArea"
-                            Value="@Model!.Notes"/>
+                            @bind-Value="@Model!.Notes"/>
         </div>
         <div class="col-md-4">
             <button type="submit" class="btn btn-primary btn-lg">Submit</button>
