@@ -20,7 +20,7 @@
         break;
     default:
         <label>@_labelText</label>
-        <input type="@_inputDataType" value="@_value" oninput="@onInput" class="form-control"
+        <input type="@_inputDataType" step="@_decimalStep" min="@_decimalMin" max="@_decimalMax" value="@_value" oninput="@onInput" class="form-control"
                placeholder="@_placeholder">
         break;
 }
@@ -30,6 +30,10 @@
     private string? _labelText;
     private string? _inputType;
     private string? _inputDataType;
+    private string? _decimalStep;
+    private string? _decimalValue;
+    private string? _decimalMin;
+    private string? _decimalMax;
     private string? _value;
     private string? _placeholder;
     private string? _optionLabel;
@@ -39,6 +43,10 @@
     [Parameter] public string? InputType { get; set; }
     [Parameter] public string? LabelText { get; set; }
     [Parameter] public string? InputDataType { get; set; }
+    [Parameter] public string? DecimalStep { get; set; }
+    [Parameter] public string? DecimalValue { get; set; }
+    [Parameter] public string? DecimalMin { get; set;  }
+    [Parameter] public string? DecimalMax { get; set; }
     [Parameter] public string? Value { get; set; }
     [Parameter] public string? Placeholder { get; set; }
     [Parameter] public List<string>? SelectItems { get; set; }
@@ -55,6 +63,10 @@
         _labelText = LabelText;
         _inputType = InputType;
         _inputDataType = InputDataType;
+        _decimalStep = DecimalStep;
+        _decimalValue = DecimalValue;
+        _decimalMin = DecimalMin;
+        _decimalMax = DecimalMax;
         _placeholder = Placeholder;
         _selectItems = SelectItems;
         _optionLabel = OptionLabel;

@@ -46,15 +46,19 @@ namespace SeizureTrackerBlazer.Constants
         internal const string TextArea = "textarea";
         internal const string Email = "email";
         internal const string Number = "number";
+        internal const string Decimal = "decimal";
     }
 
     internal static class InputLabels
     {
-        internal const string SeizureDescription = "Seizure Description";
-        internal const string DateOfSeizure = "Date of seizure";
-        internal const string TimeOfSeizure = "Time of seizure";
+        internal const string SeizureDescription = "Seizure description";
+        internal const string DateAndTime = "Date and time of seizure";
         internal const string Intensity = "Intensity";
-        internal const string MedicationChange = "Medication Change";
+        internal const string MedicationChange = "Medication change";
+        internal const string MedicationChangeDescription = "Medication change description";
+        internal const string Notes = "Additional notes";
+        internal const string SleepAmount = "Sleep amount";
+        internal const string SeizureType = "Seizure type";
     }
 
     internal static class PlaceholderLabels
