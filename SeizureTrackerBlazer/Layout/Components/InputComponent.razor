@@ -18,9 +18,16 @@
             }
         </select>
         break;
+    case InputTypes.TextArea:
+        <label>@_labelText</label>
+        <textarea value="@_value" rows="3" onchange="@onInput" class="form-control"
+                  aria-label="@_labelText">
+        </textarea>
+        break;
     default:
         <label>@_labelText</label>
-        <input type="@_inputDataType" step="@_decimalStep" min="@_decimalMin" max="@_decimalMax" value="@_value" oninput="@onInput" class="form-control"
+        <input type="@_inputDataType" step="@_decimalStep" min="@_decimalMin" max="@_decimalMax" value="@_value"
+               oninput="@onInput" class="form-control"
                placeholder="@_placeholder">
         break;
 }
@@ -45,7 +52,7 @@
     [Parameter] public string? InputDataType { get; set; }
     [Parameter] public string? DecimalStep { get; set; }
     [Parameter] public string? DecimalValue { get; set; }
-    [Parameter] public string? DecimalMin { get; set;  }
+    [Parameter] public string? DecimalMin { get; set; }
     [Parameter] public string? DecimalMax { get; set; }
     [Parameter] public string? Value { get; set; }
     [Parameter] public string? Placeholder { get; set; }

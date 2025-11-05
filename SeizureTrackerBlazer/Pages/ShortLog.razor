@@ -1,0 +1,18 @@
+@page "/"
+@attribute [Authorize]
+@inject StateContainer StateContainer
+@inject ISeizureTrackerService SeizureTrackerService
+
+<div class="container d-flex justify-content-center align-items-center flex-column py-5">
+    <button @onclick="test" type="button" class="btn btn-outline-danger btn-lg my-3">Partial</button>
+    <button @onclick="test" type="button" class="btn btn-outline-warning btn-lg my-3">Complex</button>
+    <button @onclick="test" type="button" class="btn btn-outline-info btn-lg my-3">Musicogenic</button>
+</div>
+
+@code {
+
+    private void test()
+    {
+    }
+
+}

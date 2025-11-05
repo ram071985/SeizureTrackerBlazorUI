@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@* @page "/" *@
 @using System.Text.Json
 @attribute [Authorize]
 @inject StateContainer StateContainer
@@ -64,14 +64,12 @@
         </div>
         <div class="col-md-3">
             <InputComponent LabelText="@InputLabels.MedicationChangeDescription"
-                            InputType="@InputTypes.Input"
-                            InputDataType="@InputDataTypes.TextArea"
+                            InputType="@InputTypes.TextArea"
                             @bind-Value="@Model!.MedicationChangeDescription"/>
         </div>
         <div class="col-md-3">
             <InputComponent LabelText="@InputLabels.Notes"
-                            InputType="@InputTypes.Input"
-                            InputDataType="@InputDataTypes.TextArea"
+                            InputType="@InputTypes.TextArea"
                             @bind-Value="@Model!.Notes"/>
         </div>
         <div class="col-md-4">

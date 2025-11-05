@@ -1,5 +1,3 @@
-
-
 namespace SeizureTrackerBlazer.Models
 {
     public class SeizureActivityLog
@@ -14,13 +12,7 @@ namespace SeizureTrackerBlazer.Models
         public string? SleepAmount { get; set; }
         public string? SeizureIntensity { get; set; }
         public string? Notes { get; set; }
-
-        
-        // public string KetonesLevel { get; set; }
-        
-        
-        
-        
- 
+        public bool? ShortLog { get; set; }
+        public string? Duration { get; set; }
     }
 }

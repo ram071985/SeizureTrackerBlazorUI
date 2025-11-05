@@ -35,6 +35,7 @@ namespace SeizureTrackerBlazer.Constants
         internal const string Input = "Input";
         internal const string Checkbox = "Checkbox";
         internal const string Select = "Select";
+        internal const string TextArea = "TextArea";
     }
 
     internal static class InputDataTypes
