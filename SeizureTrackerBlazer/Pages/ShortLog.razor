@@ -2,17 +2,37 @@
 @attribute [Authorize]
 @inject StateContainer StateContainer
 @inject ISeizureTrackerService SeizureTrackerService
-
+@using Constants
 <div class="container d-flex justify-content-center align-items-center flex-column py-5">
-    <button @onclick="test" type="button" class="btn btn-outline-danger btn-lg my-3">Partial</button>
-    <button @onclick="test" type="button" class="btn btn-outline-warning btn-lg my-3">Complex</button>
-    <button @onclick="test" type="button" class="btn btn-outline-info btn-lg my-3">Musicogenic</button>
+    <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit" class="btn btn-outline-danger btn-lg my-3">Simple</button>
+    <button onclick="@(() => Submit(Enums.SeizureTypes.Complex))" type="submit" class="btn btn-outline-warning btn-lg my-3">Complex</button>
+    <button onclick="@(() => Submit(Enums.SeizureTypes.Reflex))" type="submit" class="btn btn-outline-info btn-lg my-3">Reflex</button>
 </div>
 
 @code {
 
-    private void test()
+    private async Task Submit(Enums.SeizureTypes type)
     {
+        SeizureActivityLog seizureLog = new();
+        seizureLog.SeizureDate = DateTime.Now.ToUniversalTime().ToString();
+        
+        try
+        {
+            seizureLog.SeizureType = type switch
+            {
+                Enums.SeizureTypes.Simple => SeizureTypes.Simple,
+                Enums.SeizureTypes.Complex => SeizureTypes.Complex,
+                Enums.SeizureTypes.Reflex => SeizureTypes.Reflex,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+
+            await StateContainer.AddSeizureActivityLog(seizureLog);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
     }
 
 }

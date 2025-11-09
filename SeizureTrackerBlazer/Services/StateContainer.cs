@@ -45,7 +45,7 @@ namespace SeizureTrackerBlazer.Services
 
         #region Construction
 
-        public StateContainer(IConfiguration config)
+        public StateContainer(IConfiguration config, IHttpClientFactory httpClientFactory)
         {
             _seizureTypes = new List<string>
             {
@@ -65,6 +65,8 @@ namespace SeizureTrackerBlazer.Services
                 { MedChange.Yes },
                 { MedChange.No },
             };
+
+            _seizureTrackerService = new SeizureTrackerService(config, httpClientFactory);
         }
 
         public async Task AddSeizureActivityLog(SeizureActivityLog seizureActivityLog)

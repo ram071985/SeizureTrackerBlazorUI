@@ -28,6 +28,8 @@ namespace SeizureTrackerBlazer.Constants
         internal const string HeatSensory = "Heat/Sensory";
         internal const string Anxiety = "Anxiety";
         internal const string MedicationChange = "Medication Change";
+        internal const string Reflex =  "Reflex";
+        internal const string Simple = "Simple";
     }
 
     internal static class InputTypes
