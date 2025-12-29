@@ -2,20 +2,48 @@
 @attribute [Authorize]
 @inject StateContainer StateContainer
 @inject ISeizureTrackerService SeizureTrackerService
+@inject IJSRuntime JSRuntime
 @using Constants
+
 <div class="container d-flex justify-content-center align-items-center flex-column py-5">
-    <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit" class="btn btn-outline-danger btn-lg my-3">Simple</button>
-    <button onclick="@(() => Submit(Enums.SeizureTypes.Complex))" type="submit" class="btn btn-outline-warning btn-lg my-3">Complex</button>
-    <button onclick="@(() => Submit(Enums.SeizureTypes.Reflex))" type="submit" class="btn btn-outline-info btn-lg my-3">Reflex</button>
+    <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit"
+            class="btn btn-outline-danger btn-lg my-3">Simple
+    </button>
+    <button @onclick="() => Submit(Enums.SeizureTypes.Complex)" type="submit"
+            class="btn btn-outline-warning btn-lg my-3">Complex
+    </button>
+    <button @onclick="() => Submit(Enums.SeizureTypes.Reflex)" type="submit"
+            class="btn btn-outline-info btn-lg my-3">Reflex
+    </button>
 </div>
 
+<ToasterComponent ToasterMessage="@_toasterMessage"></ToasterComponent>
+
 @code {
+    private bool _isSubmitted;
+    private string _toasterMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isSubmitted = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _toasterMessage = $"The {SeizureTypes.Simple} seizure was recorded successfully..";
+
+            await ShowMyToast();
+        }
+      //  _toasterMessage = $"The {SeizureTypes.Simple} seizure was recorded successfully..";
+    }
 
     private async Task Submit(Enums.SeizureTypes type)
     {
         SeizureActivityLog seizureLog = new();
         seizureLog.SeizureDate = DateTime.Now.ToUniversalTime().ToString();
-        
+
         try
         {
             seizureLog.SeizureType = type switch
@@ -27,6 +55,10 @@
             };
 
             await StateContainer.AddSeizureActivityLog(seizureLog);
+
+            _toasterMessage = $"The {seizureLog.SeizureType} seizure was recorded successfully..";
+
+            // await ShowMyToast();
         }
         catch (Exception ex)
         {
@@ -35,4 +67,17 @@
         }
     }
 
+    private async Task ShowMyToast()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("showToast", "liveToast");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+            throw;
+        }
+    }
 }
