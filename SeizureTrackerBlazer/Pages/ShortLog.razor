@@ -5,7 +5,13 @@
 @inject IJSRuntime JSRuntime
 @using Constants
 
-<div class="container d-flex justify-content-center align-items-center flex-column py-5">
+@if (_submitting)
+{
+    <SpinnerComponent></SpinnerComponent>
+}
+else
+{
+<div class="container d-flex justify-content-center align-items-center flex-column py-5 my-3">
     <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit"
             class="btn btn-outline-danger btn-lg my-3">Simple
     </button>
@@ -16,31 +22,21 @@
             class="btn btn-outline-info btn-lg my-3">Reflex
     </button>
 </div>
-
+}
 <ToasterComponent ToasterMessage="@_toasterMessage"></ToasterComponent>
-
 @code {
-    private bool _isSubmitted;
+    private bool _submitting;
     private string _toasterMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        _isSubmitted = false;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _toasterMessage = $"The {SeizureTypes.Simple} seizure was recorded successfully..";
-
-            await ShowMyToast();
-        }
-      //  _toasterMessage = $"The {SeizureTypes.Simple} seizure was recorded successfully..";
+        _submitting = false;
     }
 
     private async Task Submit(Enums.SeizureTypes type)
     {
+        _submitting = true;
+
         SeizureActivityLog seizureLog = new();
         seizureLog.SeizureDate = DateTime.Now.ToUniversalTime().ToString();
 
@@ -55,10 +51,12 @@
             };
 
             await StateContainer.AddSeizureActivityLog(seizureLog);
+            
+            _submitting = false;
+            
+            _toasterMessage = $"{seizureLog.SeizureType} seizure recorded.";
 
-            _toasterMessage = $"The {seizureLog.SeizureType} seizure was recorded successfully..";
-
-            // await ShowMyToast();
+            await ShowMyToast();
         }
         catch (Exception ex)
         {
@@ -80,4 +78,5 @@
             throw;
         }
     }
+
 }

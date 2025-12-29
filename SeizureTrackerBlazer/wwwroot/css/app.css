@@ -9,11 +9,15 @@ html, body, #app {
     left: 50%;
     transform: translateX(-50%);
     background: black !important;
-    border: 1px solid white !important;
+    border: 1px solid #198754 !important;
+    color: white !important;
 }
-
-.btn-close.toaster-button {
-
+.toast-body {
+    color: #198754 !important;
+    /*margin: auto !important;*/
+}
+.btn-close {
+    color: #198754 !important;
 }
 
 .valid.modified:not([type=checkbox]) {
