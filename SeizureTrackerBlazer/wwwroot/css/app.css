@@ -3,6 +3,9 @@ html, body, #app {
     color: white;
 }
 
+nav.navbar.navbar-dark.bg-dark {
+    background-color: #0F0F0F !important;
+}
 .toaster-snippet {
     position: fixed;
     bottom: 0;

@@ -13,9 +13,9 @@
     
     protected override async Task OnParametersSetAsync()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        
-        var user = authState.User;
+        // var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        //
+        // var user = authState.User;
 
         // if (user.Identity is not null && !user.Identity.IsAuthenticated)
         //     Navigation.NavigateToLogin("authentication/login");

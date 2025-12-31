@@ -1,5 +1,5 @@
 @page "/"
-@attribute [Authorize]
+@* @attribute [Authorize] *@
 @inject StateContainer StateContainer
 @inject ISeizureTrackerService SeizureTrackerService
 @inject IJSRuntime JSRuntime
@@ -11,7 +11,7 @@
 }
 else
 {
-<div class="container d-flex justify-content-center align-items-center flex-column py-5 my-3">
+<div class="container d-flex justify-content-center align-items-center flex-column py-5 my-5">
     <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit"
             class="btn btn-outline-danger btn-lg my-3">Simple
     </button>
