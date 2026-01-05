@@ -3,42 +3,51 @@
 @inject StateContainer StateContainer
 @inject ISeizureTrackerService SeizureTrackerService
 @inject IJSRuntime JSRuntime
+@using System.Linq.Expressions
 @using Constants
 
-@if (_submitting)
-{
-    <SpinnerComponent></SpinnerComponent>
-}
-else
-{
-<div class="container d-flex justify-content-center align-items-center flex-column py-5 my-5">
-    <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit"
-            class="btn btn-outline-danger btn-lg my-3">Simple
-    </button>
-    <button @onclick="() => Submit(Enums.SeizureTypes.Complex)" type="submit"
-            class="btn btn-outline-warning btn-lg my-3">Complex
-    </button>
-    <button @onclick="() => Submit(Enums.SeizureTypes.Reflex)" type="submit"
-            class="btn btn-outline-info btn-lg my-3">Reflex
-    </button>
+<div class="container log-button-container d-flex justify-content-center align-items-center flex-column py-5 my-5">
+    @if (_submitting)
+    {
+        <div class="d-flex align-items-center justify-content-center">
+            <SpinnerComponent Color="@_loadingSpinnerColor"></SpinnerComponent>
+        </div>
+    }
+    else
+    {
+        <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit"
+                class="btn btn-outline-danger btn-lg my-3">Simple
+        </button>
+        <button @onclick="() => Submit(Enums.SeizureTypes.Complex)" type="submit"
+                class="btn btn-outline-warning btn-lg my-3">Complex
+        </button>
+        <button @onclick="() => Submit(Enums.SeizureTypes.Reflex)" type="submit"
+                class="btn btn-outline-info btn-lg my-3">Reflex
+        </button>
+    }
+    <ToasterComponent TextColor="@_toasterTextColor" BorderColor="@_toasterBorderColor" ToasterMessage="@_toasterMessage"></ToasterComponent>
 </div>
-}
-<ToasterComponent ToasterMessage="@_toasterMessage"></ToasterComponent>
+
 @code {
     private bool _submitting;
     private string _toasterMessage;
+    private string _loadingSpinnerColor;
+    private string _toasterBorderColor;
+    private string _toasterTextColor;
 
     protected override async Task OnInitializedAsync()
     {
         _submitting = false;
+        _loadingSpinnerColor = "text-info";
     }
 
     private async Task Submit(Enums.SeizureTypes type)
     {
         _submitting = true;
 
-        SeizureActivityLog seizureLog = new();
-        seizureLog.SeizureDate = DateTime.Now.ToUniversalTime().ToString();
+        SeizureActivityDetail seizureLog = new();
+
+        seizureLog.SeizureTime = DateTime.Now.ToUniversalTime().ToString();
 
         try
         {
@@ -51,17 +60,24 @@ else
             };
 
             await StateContainer.AddSeizureActivityLog(seizureLog);
-            
+
             _submitting = false;
-            
+
+            _toasterBorderColor = "#28a745";
+            _toasterTextColor = "text-success";
             _toasterMessage = $"{seizureLog.SeizureType} seizure recorded.";
 
             await ShowMyToast();
         }
         catch (Exception ex)
         {
+            _toasterBorderColor = "#dc3545";
+            _toasterTextColor = "text-danger";
+            _toasterMessage = $"Something went wrong while saving the log...";
+            
+            await ShowMyToast();
+
             Console.WriteLine(ex);
-            throw;
         }
     }
 
@@ -74,8 +90,6 @@ else
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-
-            throw;
         }
     }
 

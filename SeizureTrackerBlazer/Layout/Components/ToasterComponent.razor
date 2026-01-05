@@ -1,6 +1,7 @@
-<div id="liveToast" class="my-3 toast toaster-snippet" role="alert" aria-live="assertive" aria-atomic="true">
+<div id="liveToast" class="my-3 toast toaster-snippet" style="@_borderColor" role="alert"
+     aria-live="assertive" aria-atomic="true">
     <div class="d-flex justify-content-around align-items-center">
-        <div class="toast-body">
+        <div class="toast-body @_textColor">
             @_toasterMessage
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -9,11 +10,18 @@
 
 @code {
     private string _toasterMessage;
+    private string _borderColor;
+    private string _textColor;
+    
     [Parameter] public string ToasterMessage { get; set; }
+    [Parameter] public string BorderColor { get; set; }
+    [Parameter] public string TextColor { get; set; }
 
     protected override void OnParametersSet()
     {
         _toasterMessage = ToasterMessage;
+        _borderColor = $"border: 1px solid {BorderColor} !important";
+        _textColor = TextColor;
     }
 
 }

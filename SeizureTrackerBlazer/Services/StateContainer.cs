@@ -69,7 +69,7 @@ namespace SeizureTrackerBlazer.Services
             _seizureTrackerService = new SeizureTrackerService(config, httpClientFactory);
         }
 
-        public async Task AddSeizureActivityLog(SeizureActivityLog seizureActivityLog)
+        public async Task AddSeizureActivityLog(SeizureActivityDetail seizureActivityLog)
         {
             try
             {

@@ -13,8 +13,22 @@ public class SeizureTrackerService : ISeizureTrackerService
         _client = httpClientFactory.CreateClient();
         _apiBaseAddress = config.GetValue<string>("ApiBaseAddress");
         _apiName = config.GetValue<string>(AppSettings.SeizureTrackerAPIName);
-        
+
         _client.BaseAddress = new Uri(_apiBaseAddress);
+    }
+
+    public async Task GetActivityHeaders()
+    {
+        try
+        {
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+
+            throw;
+        }
     }
 
     public async Task AddSeizureActivityLog(string body)

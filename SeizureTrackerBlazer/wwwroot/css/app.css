@@ -6,19 +6,20 @@ html, body, #app {
 nav.navbar.navbar-dark.bg-dark {
     background-color: #0F0F0F !important;
 }
+
+.log-button-container .btn {
+    font-size: 2.25rem !important;
+}
 .toaster-snippet {
     position: fixed;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     background: black !important;
-    border: 1px solid #198754 !important;
+    /*border: 1px solid #dc3545 !important;*/
     color: white !important;
 }
-.toast-body {
-    color: #198754 !important;
-    /*margin: auto !important;*/
-}
+
 .btn-close {
     color: #198754 !important;
 }

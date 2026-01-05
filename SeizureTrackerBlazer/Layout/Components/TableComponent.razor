@@ -1,0 +1,15 @@
+<table class="table table-hover table-dark">
+    <thead>
+    <tr>
+        @HeaderContent
+    </tr>
+    </thead>
+    <tbody>
+    @BodyContent
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public RenderFragment HeaderContent { get; set; }
+    [Parameter] public RenderFragment BodyContent { get; set; }
+}

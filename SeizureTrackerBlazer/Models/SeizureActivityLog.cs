@@ -7,11 +7,7 @@ namespace SeizureTrackerBlazer.Models
         public string? SeizureDate { get; set; }
         public string? SeizureDescription { get; set; }
         public string? SeizureType { get; set; }
-        public string? MedicationChange { get; set; }
-        public string? MedicationChangeDescription { get; set; }
-        public string? SleepAmount { get; set; }
-        public string? SeizureIntensity { get; set; }
-        public string? Notes { get; set; }
+
         public bool? ShortLog { get; set; }
         public string? Duration { get; set; }
     }
