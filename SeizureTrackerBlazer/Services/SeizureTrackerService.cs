@@ -1,4 +1,6 @@
+using System.Text.Json;
 using SeizureTrackerBlazer.Constants;
+using SeizureTrackerBlazer.Models;
 
 namespace SeizureTrackerBlazer.Services;
 
@@ -17,11 +19,14 @@ public class SeizureTrackerService : ISeizureTrackerService
         _client.BaseAddress = new Uri(_apiBaseAddress);
     }
 
-    public async Task GetActivityHeaders()
+    public async Task<List<SeizureActivityHeader>> GetActivityHeaders()
     {
+        string uri = $"{_apiName}/{ApiEndpoints.GetHeaders}";
         try
         {
+            var response = await _client.GetAsync(uri);
             
+            return JsonSerializer.Deserialize<List<SeizureActivityHeader>>(await response.Content.ReadAsStringAsync());
         }
         catch (Exception ex)
         {
@@ -40,6 +45,7 @@ public class SeizureTrackerService : ISeizureTrackerService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            
             throw;
         }
     }

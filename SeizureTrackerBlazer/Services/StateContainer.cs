@@ -68,7 +68,20 @@ namespace SeizureTrackerBlazer.Services
 
             _seizureTrackerService = new SeizureTrackerService(config, httpClientFactory);
         }
-
+        
+        public async Task<List<SeizureActivityHeader>> GetActivityHeaders()
+        {
+            try
+            {
+                return await _seizureTrackerService.GetActivityHeaders();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
+        }
+        
         public async Task AddSeizureActivityLog(SeizureActivityDetail seizureActivityLog)
         {
             try

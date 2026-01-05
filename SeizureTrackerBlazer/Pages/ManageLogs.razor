@@ -1,6 +1,29 @@
 @page "/ManageLogs"
 
-
-@code {
-    
+@if (_initialized)
+{
+    <div class="container d-flex justify-content-center align-items-center flex-column py-5 my-5">
+        <TableComponent>
+            <HeaderContent>
+                <th>Seizure Activity Date</th>
+                <th>Amount</th>
+            </HeaderContent>
+            <BodyContent>
+                @foreach (var header in _seizureActivityHeaders)
+                {
+                    <tr>
+                        <td>@header.Date</td>
+                        <td>@header.DailyTotal</td>
+                    </tr>
+                }
+            </BodyContent>
+        </TableComponent>
+    </div>
 }
+else
+{
+    <div class="d-flex align-items-center justify-content-center">
+        <SpinnerComponent Color="@_loadingSpinnerColor"></SpinnerComponent>
+    </div>
+}
+

@@ -1,7 +1,9 @@
+using SeizureTrackerBlazer.Models;
+
 namespace SeizureTrackerBlazer.Services;
 
 public interface ISeizureTrackerService
 {
     public Task AddSeizureActivityLog(string body);
-    public Task GetActivityHeaders();
+    public Task<List<SeizureActivityHeader>> GetActivityHeaders();
 }
