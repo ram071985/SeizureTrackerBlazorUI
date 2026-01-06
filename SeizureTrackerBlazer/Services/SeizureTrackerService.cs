@@ -21,12 +21,30 @@ public class SeizureTrackerService : ISeizureTrackerService
 
     public async Task<List<SeizureActivityHeader>> GetActivityHeaders()
     {
-        string uri = $"{_apiName}/{ApiEndpoints.GetHeaders}";
+        var uri = $"{_apiName}/{ApiEndpoints.GetHeaders}";
+        
         try
         {
             var response = await _client.GetAsync(uri);
             
             return JsonSerializer.Deserialize<List<SeizureActivityHeader>>(await response.Content.ReadAsStringAsync());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+
+            throw;
+        }
+    }
+    
+    public async Task<List<SeizureActivityDetail>> GetActivityDetailsByHeaderId(int headerId)
+    {
+        var uri = $"{_apiName}/{ApiEndpoints.GetDetailsByHeaderId}/{headerId}";
+        try
+        {
+            var response = await _client.GetAsync(uri);
+            
+            return JsonSerializer.Deserialize<List<SeizureActivityDetail>>(await response.Content.ReadAsStringAsync());
         }
         catch (Exception ex)
         {

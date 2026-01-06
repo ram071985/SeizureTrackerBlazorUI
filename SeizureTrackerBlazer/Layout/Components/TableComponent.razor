@@ -1,6 +1,6 @@
 <table class="table table-hover table-dark">
     <thead>
-    <tr>
+    <tr @onclick="DisplayHeaderLineItems">
         @HeaderContent
     </tr>
     </thead>
@@ -12,4 +12,18 @@
 @code {
     [Parameter] public RenderFragment HeaderContent { get; set; }
     [Parameter] public RenderFragment BodyContent { get; set; }
+    [Parameter] public EventCallback DisplayHeaderLineItems { get; set; }
+
+    // private async Task OnClick()
+    // {
+    //     try
+    //     {
+    //         
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine(ex);
+    //         throw;
+    //     }
+    // }
 }

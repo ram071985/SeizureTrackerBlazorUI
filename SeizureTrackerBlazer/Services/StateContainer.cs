@@ -82,6 +82,19 @@ namespace SeizureTrackerBlazer.Services
             }
         }
         
+        public async Task<List<SeizureActivityDetail>> GetActivityDetailsByHeaderId(int headerId)
+        {
+            try
+            {
+                return await _seizureTrackerService.GetActivityDetailsByHeaderId(headerId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
+        }
+        
         public async Task AddSeizureActivityLog(SeizureActivityDetail seizureActivityLog)
         {
             try

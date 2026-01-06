@@ -6,11 +6,11 @@ namespace SeizureTrackerBlazer.Pages;
 
 public partial class ManageLogs : ComponentBase
 {
-    private bool _initialized;
-    private bool _fetch;
+    private bool _initialized, _fetch, _detailsFetched;
     private int _count;
     private string _loadingSpinnerColor;
     private List<SeizureActivityHeader> _seizureActivityHeaders;
+    private List<SeizureActivityDetail> _seizureActivityDetails;
     
     [Inject]
     public StateContainer StateContainer { get; set; }
@@ -20,5 +20,20 @@ public partial class ManageLogs : ComponentBase
         
         _seizureActivityHeaders = await StateContainer.GetActivityHeaders();
         _initialized = true;
+    }
+
+    private async Task GetActivityDetails(int headerId)
+    {
+        try
+        {
+            _seizureActivityDetails = await StateContainer.GetActivityDetailsByHeaderId(headerId);
+            
+            _detailsFetched = _seizureActivityDetails?.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
     }
 }

@@ -5,16 +5,39 @@
     <div class="container d-flex justify-content-center align-items-center flex-column py-5 my-5">
         <TableComponent>
             <HeaderContent>
-                <th>Seizure Activity Date</th>
-                <th>Amount</th>
+                @if (!_detailsFetched)
+                {
+                    <th>Seizure Activity Date</th>
+                    <th>Amount</th>
+                }
+                else
+                {
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Comments</th>
+                }
             </HeaderContent>
             <BodyContent>
-                @foreach (var header in _seizureActivityHeaders)
+                @if (!_detailsFetched)
                 {
-                    <tr>
-                        <td>@header.Date</td>
-                        <td>@header.DailyTotal</td>
-                    </tr>
+                    foreach (var header in _seizureActivityHeaders)
+                    {
+                        <tr role="button" @onclick="() => GetActivityDetails(header.Id)">
+                            <td>@header.Date</td>
+                            <td>@header.DailyTotal</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    foreach (var detail in _seizureActivityDetails)
+                    {
+                        <tr>
+                            <td>@detail.SeizureTime</td>
+                            <td>@detail.SeizureType</td>
+                            <td>@detail.Comments</td>
+                        </tr>
+                    }
                 }
             </BodyContent>
         </TableComponent>
