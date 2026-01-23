@@ -19,6 +19,10 @@ public partial class ManageLogs : ComponentBase
         _loadingSpinnerColor = "text-info";
         
         _seizureActivityHeaders = await StateContainer.GetActivityHeaders();
+    }
+
+    protected override void OnParametersSet()
+    {
         _initialized = true;
     }
 
