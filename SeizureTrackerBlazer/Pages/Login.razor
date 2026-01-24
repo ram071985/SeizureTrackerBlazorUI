@@ -1,0 +1,56 @@
+@page "/login"
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<div class="container mt-5" style="max-width: 400px;">
+    <div class="card shadow-sm p-4 text-center">
+        <h2 class="mb-4">Seizure Recovery App</h2>
+        
+        <div class="form-group mb-3 text-start">
+            <label>Email Address</label>
+            <input @bind="email" class="form-control form-control-lg" placeholder="name@example.com" />
+        </div>
+
+        <button @onclick="HandlePasskeyLogin" class="btn btn-success btn-lg w-100 py-3 mb-3">
+            <i class="bi bi-person-badge"></i> Login with FaceID
+        </button>
+
+        <p class="text-muted small">First time? Use your password to set up biometrics.</p>
+    </div>
+</div>
+
+@code {
+    private string email = "";
+
+    private async Task HandlePasskeyLogin()
+    {
+        try
+        {
+            // 1. Get Challenge from API
+            var response = await Http.PostAsync($"api/auth/passkey-options?email={email}", null);
+            if (!response.IsSuccessStatusCode) return;
+            
+            var optionsJson = await response.Content.ReadAsStringAsync();
+
+            // 2. Trigger Biometric Sensor
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
+            var credentialJson = await module.InvokeAsync<string>("authenticatePasskey", optionsJson);
+
+            // 3. Send result to API
+            var loginResponse = await Http.PostAsJsonAsync("api/auth/passkey-login", credentialJson);
+
+            if (loginResponse.IsSuccessStatusCode)
+            {
+                Nav.NavigateTo("/dashboard");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Login failed: {ex.Message}");
+        }
+    }
+}
+
