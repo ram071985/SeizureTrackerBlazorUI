@@ -10,13 +10,9 @@ public class SeizureTrackerService : ISeizureTrackerService
     private readonly string? _apiBaseAddress;
     private readonly string? _apiName;
 
-    public SeizureTrackerService(IConfiguration config, IHttpClientFactory httpClientFactory)
+    public SeizureTrackerService(IConfiguration config, HttpClient client)
     {
-        _client = httpClientFactory.CreateClient();
-        _apiBaseAddress = config.GetValue<string>("ApiBaseAddress");
-        _apiName = config.GetValue<string>(AppSettings.SeizureTrackerAPIName);
-
-        _client.BaseAddress = new Uri(_apiBaseAddress);
+        _client = _client;
     }
 
     public async Task<List<SeizureActivityHeader>> GetActivityHeaders()

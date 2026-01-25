@@ -45,7 +45,7 @@ namespace SeizureTrackerBlazer.Services
 
         #region Construction
 
-        public StateContainer(IConfiguration config, IHttpClientFactory httpClientFactory)
+        public StateContainer(IConfiguration config, HttpClient client)
         {
             _seizureTypes = new List<string>
             {
@@ -66,7 +66,7 @@ namespace SeizureTrackerBlazer.Services
                 { MedChange.No },
             };
 
-            _seizureTrackerService = new SeizureTrackerService(config, httpClientFactory);
+            _seizureTrackerService = new SeizureTrackerService(config, client);
         }
         
         public async Task<List<SeizureActivityHeader>> GetActivityHeaders()

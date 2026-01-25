@@ -8,7 +8,9 @@ namespace SeizureTrackerBlazer.Constants
 
     internal static class AppSettings
     {
-        internal const string SeizureTrackerAPIName = "APIName";
+        internal const string ApiBaseAddress = "ApiBaseAddress";
+        internal const string AuthApi = "AuthApi";
+        internal const string TrackerApi = "APIName";
     }
 
     internal static class ApiEndpoints

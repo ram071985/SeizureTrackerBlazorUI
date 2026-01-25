@@ -4,6 +4,7 @@ using SeizureTrackerBlazer;
 using SeizureTrackerBlazer.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using SeizureTrackerBlazer.Constants;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -14,19 +15,21 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddHttpClient<ISeizureTrackerService, SeizureTrackerService>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"]);
-})
-.AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+    client.BaseAddress = new Uri(builder.Configuration[AppSettings.ApiBaseAddress]);
+});
 
-builder.Services.AddMsalAuthentication(options =>
+builder.Services.AddHttpClient<AccountClient>(client =>
 {
-    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
-    options.ProviderOptions.DefaultAccessTokenScopes
-        .Add("api://20129ded-8b40-4c7d-ab9e-1f4fc8b959b0/Seizure.Records.Read.All");
+    client.BaseAddress = new Uri(builder.Configuration[AppSettings.ApiBaseAddress]);
 });
 
 builder.Services.AddSingleton<StateContainer>();
 
 builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<IdentityAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
+    sp.GetRequiredService<IdentityAuthenticationStateProvider>());
+
 builder.Services.AddCascadingAuthenticationState();
+
 await builder.Build().RunAsync();

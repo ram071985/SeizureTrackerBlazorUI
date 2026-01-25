@@ -1,23 +1,38 @@
 ﻿@inherits LayoutComponentBase
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject IdentityAuthenticationStateProvider CustomAuthStateProvider
 @inject NavigationManager Navigation
 
-<Navbar/>
-<LoginDisplay/>
+<div class="page">
+    <div class="sidebar">
+        <Navbar />
+    </div>
 
-@Body
+    <main>
+        <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <span>Hi, @context.User.Identity?.Name</span>
+                    <button class="btn btn-link" @onclick="Logout">Logout</button>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="login">Login</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
 
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
 @code
 {
-    [Inject] AuthenticationStateProvider AuthStateProvider { get; set; }
-    
-    protected override async Task OnParametersSetAsync()
+    private void Logout()
     {
-        // var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        //
-        // var user = authState.User;
+        // 1. Tell your custom provider to clear the state
+        CustomAuthStateProvider.NotifyUserLogout();
 
-        // if (user.Identity is not null && !user.Identity.IsAuthenticated)
-        //     Navigation.NavigateToLogin("authentication/login");
+        // 2. Redirect to the public home or login page
+        Navigation.NavigateTo("login");
     }
 }

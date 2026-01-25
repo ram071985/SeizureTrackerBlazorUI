@@ -1,17 +1,16 @@
 @page "/login"
-@using Microsoft.AspNetCore.Authorization
 @attribute [AllowAnonymous]
-@inject HttpClient Http
+@inject AccountClient AccoutClient
 @inject IJSRuntime JS
-@inject NavigationManager Nav
+@inject NavigationManager Navigation
 
 <div class="container mt-5" style="max-width: 400px;">
     <div class="card shadow-sm p-4 text-center">
-        <h2 class="mb-4">Seizure Recovery App</h2>
+        <h2 class="mb-4">Seizure Tracker</h2>
         
         <div class="form-group mb-3 text-start">
             <label>Email Address</label>
-            <input @bind="email" class="form-control form-control-lg" placeholder="name@example.com" />
+            <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com" />
         </div>
 
         <button @onclick="HandlePasskeyLogin" class="btn btn-success btn-lg w-100 py-3 mb-3">
@@ -23,28 +22,30 @@
 </div>
 
 @code {
-    private string email = "";
+    private string _email = string.Empty;
 
     private async Task HandlePasskeyLogin()
     {
         try
         {
             // 1. Get Challenge from API
-            var response = await Http.PostAsync($"api/auth/passkey-options?email={email}", null);
-            if (!response.IsSuccessStatusCode) return;
-            
-            var optionsJson = await response.Content.ReadAsStringAsync();
+            var json = await AccoutClient.GetPasskeyOptionsAsync(_email);
+            if (json == null) return;
 
             // 2. Trigger Biometric Sensor
             var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
-            var credentialJson = await module.InvokeAsync<string>("authenticatePasskey", optionsJson);
+            var credentialJson = await module.InvokeAsync<string>("authenticatePasskey", json);
 
             // 3. Send result to API
-            var loginResponse = await Http.PostAsJsonAsync("api/auth/passkey-login", credentialJson);
+            var loginResponseSuccess = await AccoutClient.LoginWithPasskeyAsync(credentialJson);
 
-            if (loginResponse.IsSuccessStatusCode)
+            if (loginResponseSuccess.Data)
             {
-                Nav.NavigateTo("/dashboard");
+                Navigation.NavigateTo("/dashboard");
+            }
+            else
+            {
+            
             }
         }
         catch (Exception ex)
