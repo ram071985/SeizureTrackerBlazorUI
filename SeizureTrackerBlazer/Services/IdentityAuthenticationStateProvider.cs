@@ -25,8 +25,8 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
             if (userResponse != null)
             {
                 var identity = new ClaimsIdentity([
-                    new Claim(ClaimTypes.Email, userResponse.Email),
-                    new Claim(ClaimTypes.NameIdentifier, userResponse.UserId)
+                    new Claim(ClaimTypes.Email, userResponse.Data.Email),
+                    new Claim(ClaimTypes.NameIdentifier, userResponse.Data.UserId)
                 ], "Identity.Application");
 
                 return new AuthenticationState(new ClaimsPrincipal(identity));

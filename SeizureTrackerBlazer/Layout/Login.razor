@@ -1,26 +1,37 @@
 @page "/login"
 @attribute [AllowAnonymous]
-@inject AccountClient AccoutClient
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AccountClient AccountClient
+@inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
 
 <div class="container mt-5" style="max-width: 400px;">
-    <div class="card shadow-sm p-4 text-center">
-        <h2 class="mb-4">Seizure Tracker</h2>
-        
-        <div class="form-group mb-3 text-start">
-            <label>Email Address</label>
-            <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com" />
-            <label class="form-label">Password</label>
-            <input type="password" @bind="_password" class="form-control form-control-lg"
-                   placeholder="Required for first-time biometric setup" autocomplete="current-password" />
-            </div>
+    <div class="card shadow-sm p-4 text-center border-0">
+        <h2 class="mb-4 text-primary">Seizure Tracker</h2>
 
-        <button @onclick="HandlePasskeyLogin" class="btn btn-success btn-lg w-100 py-3 mb-3">
-            <i class="bi bi-person-badge"></i> Login with FaceID
+        <div class="form-group mb-3 text-start">
+            <label class="form-label">Email Address</label>
+            <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com" />
+
+            <label class="form-label mt-2">Password</label>
+            <input type="password" @bind="_password" class="form-control form-control-lg"
+                   placeholder="Your secret password" autocomplete="current-password" />
+        </div>
+
+        <!-- Primary Password Login -->
+        <button @onclick="HandlePasswordLogin" class="btn btn-primary btn-lg w-100 py-3 mb-2">
+            <i class="bi bi-shield-lock me-2"></i> Login with Password
         </button>
 
-        <p class="text-muted small">First time? Use your password to set up biometrics.</p>
+        <!-- Biometric Login (FaceID / TouchID) -->
+        <button @onclick="HandlePasskeyLogin" class="btn btn-outline-success btn-lg w-100 py-3 mb-3">
+            <i class="bi bi-person-badge me-2"></i> Login with FaceID
+        </button>
+
+        <p class="text-muted small">
+            New here? Log in with your password first to <a href="/Account/Manage/Passkeys">enable biometrics</a>.
+        </p>
     </div>
 </div>
 
@@ -55,7 +66,7 @@
 
                 // 3. Redirect to the Manage Passkeys page
                 // The standard .NET 10 Identity path is "Account/Manage/Passkeys"
-                Navigation.NavigateTo("Account/Manage/Passkeys", forceLoad: true);
+                Navigation.NavigateTo("manage-passkeys", forceLoad: true);
             }
             else
             {
@@ -74,7 +85,7 @@
         try
         {
             // 1. Get Challenge from API
-            var json = await AccoutClient.GetPasskeyOptionsAsync(_email);
+            var json = await AccountClient.GetPasskeyOptionsAsync(_email);
             if (json?.Data == null) return;
 
             // 2. Trigger Biometric Sensor
@@ -82,7 +93,7 @@
             var credentialJson = await module.InvokeAsync<string>("authenticatePasskey", json.Data);
 
             // 3. Send result to API
-            var loginResponseSuccess = await AccoutClient.LoginWithPasskeyAsync(credentialJson);
+            var loginResponseSuccess = await AccountClient.LoginWithPasskeyAsync(credentialJson);
 
             if (loginResponseSuccess.Data)
             {

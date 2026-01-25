@@ -14,8 +14,23 @@ public class AccountClient
     }
 
     // Used by AuthenticationStateProvider
-    public async Task<UserInfo?> GetUserInfoAsync()
-        => await _client.GetFromJsonAsync<UserInfo>("api/auth/manage/info");
+    public async Task<ServiceResult<UserInfoResponse>> GetUserInfoAsync()
+    {
+        try 
+        {
+            // The CookieHandler now automatically adds 'Include Credentials' to this call
+            var result = await _client.GetFromJsonAsync<ServiceResult<UserInfoResponse>>("api/auth/info");
+            return result ?? ServiceResult<UserInfoResponse>.Fail("Could not parse user info.");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            return ServiceResult<UserInfoResponse>.Fail("Unauthorized: Please log in.");
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<UserInfoResponse>.Fail($"Internal Error: {ex.Message}");
+        }
+    }
 
     // Used by Login.razor
     public async Task<ServiceResult<string>> GetPasskeyOptionsAsync(string email)
