@@ -104,4 +104,35 @@ public class AccountClient
             return ServiceResult<bool>.Fail("An unexpected error occurred.");
         }
     }
+    public async Task<ServiceResult<bool>> LoginWithPasswordAsync(string email, string password)
+    {
+        try
+        {
+            // Construct the payload for the API
+            var loginRequest = new { Email = email, Password = password, RememberMe = true };
+
+            // Send request to your AuthController login endpoint
+            var response = await _client.PostAsJsonAsync("api/auth/login", loginRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Ok(true);
+            }
+
+            // Handle specific status codes with custom messages
+            return response.StatusCode switch
+            {
+                System.Net.HttpStatusCode.Unauthorized => 
+                    ServiceResult<bool>.Fail("Invalid email or password."),
+                System.Net.HttpStatusCode.Locked => 
+                    ServiceResult<bool>.Fail("Account is locked. Please try again in 15 minutes."),
+                _ => 
+                    ServiceResult<bool>.Fail("An error occurred during login. Please try again.")
+            };
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Fail($"Connection error: {ex.Message}");
+        }
+    }
 }

@@ -11,7 +11,10 @@
         <div class="form-group mb-3 text-start">
             <label>Email Address</label>
             <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com" />
-        </div>
+            <label class="form-label">Password</label>
+            <input type="password" @bind="_password" class="form-control form-control-lg"
+                   placeholder="Required for first-time biometric setup" autocomplete="current-password" />
+            </div>
 
         <button @onclick="HandlePasskeyLogin" class="btn btn-success btn-lg w-100 py-3 mb-3">
             <i class="bi bi-person-badge"></i> Login with FaceID
@@ -23,25 +26,67 @@
 
 @code {
     private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string _errorMessage = string.Empty;
+    private bool _isProcessing;
+    
+    private async Task HandlePasswordLogin()
+    {
+        if (string.IsNullOrWhiteSpace(_email) || string.IsNullOrWhiteSpace(_password))
+        {
+            _errorMessage = "Email and Password are required.";
+            return;
+        }
 
+        _isProcessing = true;
+        
+        try
+        {
+            // 1. Call your existing Password Login API
+            var response = await AccountClient.LoginWithPasswordAsync(_email, _password);
+
+            if (response.Success)
+            {
+                // 2. Notify your AuthStateProvider (as you did with FaceID)
+                if (AuthStateProvider is IdentityAuthenticationStateProvider customProvider)
+                {
+                    customProvider.NotifyUserAuthentication(_email);
+                }
+
+                // 3. Redirect to the Manage Passkeys page
+                // The standard .NET 10 Identity path is "Account/Manage/Passkeys"
+                Navigation.NavigateTo("Account/Manage/Passkeys", forceLoad: true);
+            }
+            else
+            {
+                _errorMessage = "Invalid login attempt.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Login failed. Please try again.";
+            Console.WriteLine(ex.Message);
+        }
+        finally { _isProcessing = false; }
+    }
     private async Task HandlePasskeyLogin()
     {
         try
         {
             // 1. Get Challenge from API
             var json = await AccoutClient.GetPasskeyOptionsAsync(_email);
-            if (json == null) return;
+            if (json?.Data == null) return;
 
             // 2. Trigger Biometric Sensor
             var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
-            var credentialJson = await module.InvokeAsync<string>("authenticatePasskey", json);
+            var credentialJson = await module.InvokeAsync<string>("authenticatePasskey", json.Data);
 
             // 3. Send result to API
             var loginResponseSuccess = await AccoutClient.LoginWithPasskeyAsync(credentialJson);
 
             if (loginResponseSuccess.Data)
             {
-                Navigation.NavigateTo("/dashboard");
+                Navigation.NavigateTo("/");
             }
             else
             {
