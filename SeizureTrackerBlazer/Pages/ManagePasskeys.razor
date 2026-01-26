@@ -1,6 +1,6 @@
 @page "/manage-passkeys"
 @attribute [Authorize]
-@inject HttpClient Http
+@inject AccountClient AccountClient
 @inject IJSRuntime JS
 
 <div class="container mt-4">
@@ -30,17 +30,17 @@
         try
         {
             // 1. Request Creation Options from API
-            var response = await Http.PostAsync("api/auth/register-options", null);
-            var optionsJson = await response.Content.ReadAsStringAsync();
+   
+            var jsonOptions = await AccountClient.GetRegisterPasskeyOptionsAsync();
 
             // 2. Trigger Browser "Create Passkey" Ceremony
             var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
-            var credentialJson = await module.InvokeAsync<string>("registerPasskey", optionsJson);
+            var credentialJson = await module.InvokeAsync<string>("registerPasskey", jsonOptions.Data);
 
             // 3. Send Public Key to API to save in AspNetUserPasskeys table
-            var result = await Http.PostAsJsonAsync("api/auth/register-complete", credentialJson);
+            var result = await AccountClient.RegisterPasskeyFinishAsync(credentialJson);
 
-            if (result.IsSuccessStatusCode)
+            if (result.Success)
             {
                 // Logic to refresh UI or show success message
                 Console.WriteLine("Biometrics linked!");

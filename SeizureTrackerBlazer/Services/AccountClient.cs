@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using SeizureTrackerBlazer.Models;
 using SeizureTrackerBlazer.Pages;
 
@@ -18,9 +19,20 @@ public class AccountClient
     {
         try 
         {
-            // The CookieHandler now automatically adds 'Include Credentials' to this call
-            var result = await _client.GetFromJsonAsync<ServiceResult<UserInfoResponse>>("api/auth/info");
-            return result ?? ServiceResult<UserInfoResponse>.Fail("Could not parse user info.");
+            // 1. Use Web Defaults to automatically handle case-insensitive property matching
+            // (This fixes the null result issues caused by camelCase vs PascalCase)
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            
+            // 2. Stream directly from the response for better performance
+            var result = await _client.GetFromJsonAsync<ServiceResult<UserInfoResponse>>("api/auth/info", options);
+
+            // 3. Handle null or missing data
+            if (result is null)
+            {
+                return ServiceResult<UserInfoResponse>.Fail("Invalid response from server.");
+            }
+
+            return result;
         }
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
@@ -148,6 +160,68 @@ public class AccountClient
         catch (Exception ex)
         {
             return ServiceResult<bool>.Fail($"Connection error: {ex.Message}");
+        }
+    }
+    
+    public async Task<ServiceResult<string>> GetRegisterPasskeyOptionsAsync()
+    {
+        try
+        {
+            // This call requires the user to be already logged in (Authorize attribute on server)
+            // The CookieHandler will automatically include the session cookie.
+            var response = await _client.GetAsync("api/auth/register-options");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // We read as string because the server returns the raw WebAuthn JSON
+                var jsonOptions = await response.Content.ReadAsStringAsync();
+                return ServiceResult<string>.Ok(jsonOptions);
+            }
+
+            // Handle specific status codes for registration
+            return response.StatusCode switch
+            {
+                System.Net.HttpStatusCode.Unauthorized => 
+                    ServiceResult<string>.Fail("Session expired. Please log in again with your password."),
+                System.Net.HttpStatusCode.InternalServerError => 
+                    ServiceResult<string>.Fail("The server is not configured for biometrics."),
+                _ => 
+                    ServiceResult<string>.Fail("Could not initiate biometric registration.")
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            return ServiceResult<string>.Fail($"Network error: {ex.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<string>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+    public async Task<ServiceResult<bool>> RegisterPasskeyFinishAsync(string credentialJson)
+    {
+        try
+        {
+            // 1. Submit the signed biometric result to the API
+            // The CookieHandler ensures the session cookie is sent to identify the user
+            var response = await _client.PostAsJsonAsync("api/auth/register-passkey-finish", credentialJson);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Ok(true);
+            }
+
+            // 2. Handle failures (e.g., challenge expired or device already registered)
+            var error = await response.Content.ReadAsStringAsync();
+            return ServiceResult<bool>.Fail(error ?? "Could not save biometric key.");
+        }
+        catch (HttpRequestException ex)
+        {
+            return ServiceResult<bool>.Fail($"Network error: {ex.StatusCode}");
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 }

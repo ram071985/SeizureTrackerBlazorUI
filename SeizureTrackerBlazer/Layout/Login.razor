@@ -41,6 +41,73 @@
     private string _errorMessage = string.Empty;
     private bool _isProcessing;
     
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await TriggerImmediateBiometricPrompt();
+        }
+    }
+private async Task TriggerImmediateBiometricPrompt()
+{
+    try
+    {
+        // 1. Request a "Discoverable" challenge (no email specified)
+        // This asks the device: "Do you have any face/fingerprint for this app?"
+        var optionsResult = await AccountClient.GetPasskeyOptionsAsync(string.Empty);
+        
+        if (!optionsResult.Success || string.IsNullOrEmpty(optionsResult.Data))
+        {
+            // Fail silently: Server might not support discoverable credentials 
+            // or the network is down. User can still use password.
+            return; 
+        }
+
+        var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
+        
+        // 2. Trigger the OS biometric prompt
+        // Use a timeout or mediation 'conditional' in JS to prevent blocking the UI
+        var credentialJson = await module.InvokeAsync<string>("authenticatePasskeyImmediate", optionsResult.Data);
+
+        if (!string.IsNullOrEmpty(credentialJson))
+        {
+            // 3. Verify signature and log in
+            var loginResult = await AccountClient.LoginWithPasskeyAsync(credentialJson);
+            
+            if (loginResult.Success)
+            {
+                if (AuthStateProvider is IdentityAuthenticationStateProvider customProvider)
+                {
+                    // Update UI state before navigating
+                    customProvider.NotifyUserAuthentication("PasskeyUser");
+                }
+                Navigation.NavigateTo("/", forceLoad: true);
+            }
+        }
+    }
+    catch (JSException jsEx)
+    {
+        // Handle common Browser/Hardware errors
+        if (jsEx.Message.Contains("NotAllowedError"))
+        {
+            // User cancelled the prompt or timed out. 
+            // We do nothing so they can still see the manual login form.
+            Console.WriteLine("Biometric prompt ignored by user.");
+        }
+        else if (jsEx.Message.Contains("SecurityError"))
+        {
+            _errorMessage = "Biometrics unavailable. Check your device settings.";
+        }
+    }
+    catch (Exception ex)
+    {
+        // Infrastructure errors (API down, etc.)
+  
+        // We don't show an alert here because it's an 'auto' background task.
+        // Let the user use the manual buttons instead.
+    }
+}
+
     private async Task HandlePasswordLogin()
     {
         if (string.IsNullOrWhiteSpace(_email) || string.IsNullOrWhiteSpace(_password))

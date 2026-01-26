@@ -2,6 +2,7 @@ namespace SeizureTrackerBlazer.Models;
 
 public class UserInfoResponse
 {
+    public UserInfoResponse() { } 
     // 'required' ensures these are never null when the object is created
     public required string UserId { get; set; }
     public required string Email { get; set; }

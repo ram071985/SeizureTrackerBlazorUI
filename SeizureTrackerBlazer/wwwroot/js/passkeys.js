@@ -41,3 +41,16 @@ export async function authenticatePasskey(optionsJson) {
         throw err;
     }
 }
+
+export async function authenticatePasskeyImmediate(optionsJson) {
+    const options = JSON.parse(optionsJson);
+
+    // mediation: 'conditional' allows the UI to surface automatically 
+    // integrated with browser autofill or as a direct prompt if discoverable
+    const credential = await navigator.credentials.get({
+        publicKey: options,
+        mediation: 'conditional'
+    });
+
+    return JSON.stringify(credential);
+}
