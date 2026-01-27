@@ -1,0 +1,40 @@
+@page "/logout"
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+@inject AccountClient AccountClient
+
+<PageTitle>Logging out...</PageTitle>
+
+<div class="text-center mt-5">
+    <div class="spinner-border text-info" role="status"></div>
+    <p class="mt-3">Securing your session...</p>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // 1. Try to tell the server we are logging out
+            await AccountClient.LogoutAsync();
+        }
+        catch (Exception)
+        {
+            // If the server call fails (e.g. offline), we still proceed
+            // to clear the local state for security.
+        }
+        finally
+        {
+            // 2. Clear local auth state (Removes ClaimsPrincipal)
+            if (AuthStateProvider is IdentityAuthenticationStateProvider customProvider)
+            {
+                customProvider.NotifyUserLogout();
+            }
+
+            // 3. Force a reload to the root.
+            // This resets the WASM state and triggers the biometric login flow.
+            Navigation.NavigateTo("/", forceLoad: true);
+        }
+    }
+}
+

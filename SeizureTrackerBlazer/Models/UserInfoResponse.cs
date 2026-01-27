@@ -6,6 +6,7 @@ public class UserInfoResponse
     // 'required' ensures these are never null when the object is created
     public required string UserId { get; set; }
     public required string Email { get; set; }
+    public bool IsAuthenticated { get; set; }
     public bool IsEmailConfirmed { get; set; }
     
     // Initialized to empty lists to avoid null reference exceptions in Razor components

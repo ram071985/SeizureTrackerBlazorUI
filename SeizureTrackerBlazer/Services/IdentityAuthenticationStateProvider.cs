@@ -21,7 +21,11 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
         {
             // .NET 10 Identity API includes an /info endpoint to get user data
             var userResponse = await _client.GetUserInfoAsync();
-
+            
+            if (userResponse.Data == null || !userResponse.Data.IsAuthenticated)
+            {
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
             if (userResponse != null)
             {
                 var identity = new ClaimsIdentity([
@@ -34,7 +38,7 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
         }
         catch (Exception)
         {
-            /* Handle network errors */
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
         return new AuthenticationState(_anonymous);
@@ -47,11 +51,12 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
         var user = new ClaimsPrincipal(identity);
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
-
-    // Call this during logout
+    
     public void NotifyUserLogout()
     {
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_anonymous)));
+        var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
+        var authState = Task.FromResult(new AuthenticationState(anonymousUser));
+        NotifyAuthenticationStateChanged(authState);
     }
 }
 

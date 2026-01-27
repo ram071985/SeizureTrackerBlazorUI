@@ -1,35 +1,22 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components.Authorization
 
 <div class="page">
     <AuthorizeView>
         <Authorized>
-            @* Navigation Bar - Only visible when Logged In *@
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
-                <div class="container">
-                    <span class="navbar-brand fw-bold">
-                        <i class="bi bi-activity"></i> Seizure Tracker
-                    </span>
-                    
-                    <div class="d-flex align-items-center">
-                        <a href="/settings" class="btn btn-outline-light btn-sm me-2">
-                            <i class="bi bi-gear-fill"></i>
-                        </a>
-                        <button class="btn btn-light btn-sm" @onclick="Logout">Logout</button>
-                    </div>
-                </div>
-            </nav>
+            @* Show the separate NavMenu component only when logged in *@
+            <Navbar />
 
-            <main class="container">
-                @Body
+            <main class="container py-4">
+                <article class="content px-4">
+                    @Body
+                </article>
             </main>
         </Authorized>
 
         <NotAuthorized>
             @* 
-               When Not Authorized, Routes.razor renders <Login /> into @Body.
-               We wrap it in a simple container without the navigation bar.
+               Login.razor is rendered here via @Body. 
+               We omit the NavMenu so the biometric prompt is the focus.
             *@
             <main class="container mt-5">
                 @Body
@@ -37,12 +24,4 @@
         </NotAuthorized>
     </AuthorizeView>
 </div>
-
-@code {
-    private void Logout()
-    {
-        // Redirect to your logout logic
-        Navigation.NavigateTo("logout", forceLoad: true);
-    }
-}
 

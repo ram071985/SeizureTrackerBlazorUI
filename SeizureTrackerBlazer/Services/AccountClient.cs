@@ -224,4 +224,30 @@ public class AccountClient
             return ServiceResult<bool>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
+    public async Task<ServiceResult<bool>> LogoutAsync()
+    {
+        try
+        {
+            // 1. Attempt to notify the server to revoke the cookie
+            var response = await _client.PostAsync("api/auth/logout", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Ok(true);
+            }
+        
+            return ServiceResult<bool>.Fail("Server could not process logout.");
+        }
+        catch (HttpRequestException ex)
+        {
+            // Log network issues, but don't crash the app
+            Console.WriteLine($"Network error during logout: {ex.Message}");
+            return ServiceResult<bool>.Fail("Network error.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Unexpected error during logout: {ex.Message}");
+            return ServiceResult<bool>.Fail("An unexpected error occurred.");
+        }
+    }
 }
