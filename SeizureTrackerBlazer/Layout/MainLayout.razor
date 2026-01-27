@@ -1,38 +1,48 @@
 ﻿@inherits LayoutComponentBase
-@inject IdentityAuthenticationStateProvider CustomAuthStateProvider
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Authorization
 
 <div class="page">
-    <div class="sidebar">
-        <Navbar />
-    </div>
+    <AuthorizeView>
+        <Authorized>
+            @* Navigation Bar - Only visible when Logged In *@
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
+                <div class="container">
+                    <span class="navbar-brand fw-bold">
+                        <i class="bi bi-activity"></i> Seizure Tracker
+                    </span>
+                    
+                    <div class="d-flex align-items-center">
+                        <a href="/settings" class="btn btn-outline-light btn-sm me-2">
+                            <i class="bi bi-gear-fill"></i>
+                        </a>
+                        <button class="btn btn-light btn-sm" @onclick="Logout">Logout</button>
+                    </div>
+                </div>
+            </nav>
 
-    <main>
-        <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <span>Hi, @context.User.Identity?.Name</span>
-                    <button class="btn btn-link" @onclick="Logout">Logout</button>
-                </Authorized>
-                <NotAuthorized>
-                    <a href="login">Login</a>
-                </NotAuthorized>
-            </AuthorizeView>
-        </div>
+            <main class="container">
+                @Body
+            </main>
+        </Authorized>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+        <NotAuthorized>
+            @* 
+               When Not Authorized, Routes.razor renders <Login /> into @Body.
+               We wrap it in a simple container without the navigation bar.
+            *@
+            <main class="container mt-5">
+                @Body
+            </main>
+        </NotAuthorized>
+    </AuthorizeView>
 </div>
-@code
-{
+
+@code {
     private void Logout()
     {
-        // 1. Tell your custom provider to clear the state
-        CustomAuthStateProvider.NotifyUserLogout();
-
-        // 2. Redirect to the public home or login page
-        Navigation.NavigateTo("login");
+        // Redirect to your logout logic
+        Navigation.NavigateTo("logout", forceLoad: true);
     }
 }
+
