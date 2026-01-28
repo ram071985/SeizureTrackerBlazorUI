@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
 @inject AccountClient AccountClient
-@inject AuthenticationStateProvider AuthStateProvider
+@inject IdentityAuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
 
@@ -54,8 +54,25 @@
         if (firstRender && !_hasTriggered)
         {
             _hasTriggered = true;
-            await Task.Delay(300); 
+            
+            // 1. Check if the user is already authenticated before popping the prompt
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                // User is already logged in (likely from the forceLoad reload)
+                // Redirect them to the dashboard and exit
+                Navigation.NavigateTo("/");
+                return;
+            }
+            
+            // 2. Only if they are anonymous, show the FaceID/TouchID prompt
+            await Task.Delay(500); 
+            
             await TriggerImmediateBiometricPrompt();
+            
+            _hasTriggered = false;
         }
     }
 private async Task TriggerImmediateBiometricPrompt()

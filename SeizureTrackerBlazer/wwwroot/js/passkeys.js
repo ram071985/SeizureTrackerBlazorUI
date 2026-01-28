@@ -42,37 +42,20 @@ export async function authenticatePasskey(optionsJson) {
     }
 }
 
-// export async function authenticatePasskeyImmediate(optionsJson) {
-//     const options = JSON.parse(optionsJson);
-//
-//     // In 2026, .NET 10 might send base64url. JS needs these as ArrayBuffers.
-//     // (Ensure your helper library or manual conversion is handling this)
-//
-//     try {
-//         const credential = await navigator.credentials.get({
-//             publicKey: options,
-//             mediation: 'conditional' // This tells the OS to show the prompt automatically
-//         });
-//
-//         // Convert the hardware response to a string for Blazor
-//         return JSON.stringify(credential);
-//     } catch (err) {
-//         // If the user hits 'Cancel', we return null to Blazor
-//         console.warn("Biometric mediation failed or was cancelled", err);
-//         return null;
-//     }
-// }
 let currentAbortController = null;
 
 export async function authenticatePasskeyImmediate(optionsJson) {
-    // 1. Cancel any previous pending request
-    if (currentAbortController) {
-        currentAbortController.abort("New request started");
+    if (window.biometricAbortController) {
+        window.biometricAbortController.abort();
     }
+
+    window.biometricAbortController = new AbortController();
+    // 1. Cancel any previous pending request
+    
     currentAbortController = new AbortController();
     
     const options = JSON.parse(optionsJson);
-
+    
     // 1. Convert the Challenge string to a binary ArrayBuffer
     if (options.challenge) {
         options.challenge = coerceToArrayBuffer(options.challenge);
@@ -88,15 +71,20 @@ export async function authenticatePasskeyImmediate(optionsJson) {
     try {
         const credential = await navigator.credentials.get({
             publicKey: options,
-            mediation: 'conditional',
-            signal: currentAbortController.signal
+            signal: window.biometricAbortController.signal
         });
 
-        // 3. Convert the hardware's binary response back to Base64 for .NET
+        window.biometricAbortController = null;
+        // 1. Capture the client extension results (even if empty)
+        const extensionResults = credential.getClientExtensionResults();
+
+        // 2. Add it to the JSON string sent back to Blazor
         return JSON.stringify({
             id: credential.id,
             rawId: coerceToBase64(credential.rawId),
             type: credential.type,
+            // .NET 10 requires this property explicitly
+            clientExtensionResults: extensionResults,
             response: {
                 authenticatorData: coerceToBase64(credential.response.authenticatorData),
                 clientDataJSON: coerceToBase64(credential.response.clientDataJSON),
@@ -127,8 +115,16 @@ function coerceToArrayBuffer(data) {
 
 // HELPER: Encodes ArrayBuffer to Base64
 function coerceToBase64(buffer) {
+    if (!buffer) return null;
+
     const binary = String.fromCharCode(...new Uint8Array(buffer));
-    return window.btoa(binary);
+
+    // Standard btoa creates "Standard Base64"
+    // We must manually convert it to "Base64Url" for the .NET 10 API
+    return window.btoa(binary)
+        .replace(/\+/g, '-') // Replace plus with dash
+        .replace(/\//g, '_') // Replace slash with underscore
+        .replace(/=/g, '');  // Remove all padding equal signs
 }
 
 
