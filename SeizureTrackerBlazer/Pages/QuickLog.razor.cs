@@ -2,6 +2,6 @@ using Microsoft.AspNetCore.Components;
 
 namespace SeizureTrackerBlazer.Pages;
 
-public partial class ShortLog : ComponentBase
+public partial class QuickLog : ComponentBase
 {
 }

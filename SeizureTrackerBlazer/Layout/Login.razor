@@ -10,14 +10,14 @@
 <div class="container mt-5" style="max-width: 400px;">
     <div class="card shadow-sm p-4 text-center border-0">
         <h2 class="mb-4 text-primary">Seizure Tracker</h2>
-        <input type="text" autocomplete="username webauthn" style="display:none;" />
+        <input type="text" autocomplete="username webauthn" style="display:none;"/>
         <div class="form-group mb-3 text-start">
             <label class="form-label">Email Address</label>
-            <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com" />
+            <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com"/>
 
             <label class="form-label mt-2">Password</label>
             <input type="password" @bind="_password" class="form-control form-control-lg"
-                   placeholder="Your secret password" autocomplete="current-password" />
+                   placeholder="Your secret password" autocomplete="current-password"/>
         </div>
 
         <!-- Primary Password Login -->
@@ -48,92 +48,97 @@
     private string _errorMessage = string.Empty;
     private bool _isProcessing;
     private bool _hasTriggered = false;
-    
+    private bool _enableAutomaticPasskeyPrompt = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && !_hasTriggered)
         {
             _hasTriggered = true;
-            
+
             // 1. Check if the user is already authenticated before popping the prompt
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
-            
-            if (user.Identity is not null && user.Identity.IsAuthenticated)
+
+            if (user.Identity is not null && user.Identity.IsAuthenticated && _enableAutomaticPasskeyPrompt)
             {
                 // User is already logged in (likely from the forceLoad reload)
                 // Redirect them to the dashboard and exit
                 Navigation.NavigateTo("/");
                 return;
             }
-            
+
             // 2. Only if they are anonymous, show the FaceID/TouchID prompt
-            await Task.Delay(500); 
-            
-            await TriggerImmediateBiometricPrompt();
-            
-            _hasTriggered = false;
+    
+                await Task.Delay(500);
+
+                await TriggerImmediateBiometricPrompt();
+
+                _hasTriggered = false;
         }
     }
-private async Task TriggerImmediateBiometricPrompt()
-{
-    try
+
+    private async Task TriggerImmediateBiometricPrompt()
     {
-        // 1. Request a "Discoverable" challenge (no email specified)
-        // This asks the device: "Do you have any face/fingerprint for this app?"
-        var optionsResult = await AccountClient.GetPasskeyOptionsAsync(string.Empty);
-        
-        if (!optionsResult.Success || string.IsNullOrEmpty(optionsResult.Data))
+        if (_enableAutomaticPasskeyPrompt) return;
+        try
         {
-            // Fail silently: Server might not support discoverable credentials 
-            // or the network is down. User can still use password.
-            return; 
-        }
+            // 1. Request a "Discoverable" challenge (no email specified)
+            // This asks the device: "Do you have any face/fingerprint for this app?"
+            var optionsResult = await AccountClient.GetPasskeyOptionsAsync(string.Empty);
 
-        var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
-        
-        // 2. Trigger the OS biometric prompt
-        // Use a timeout or mediation 'conditional' in JS to prevent blocking the UI
-        var credentialJson = await module.InvokeAsync<string>("authenticatePasskeyImmediate", optionsResult.Data);
-
-        if (!string.IsNullOrEmpty(credentialJson))
-        {
-            // 3. Verify signature and log in
-            var loginResult = await AccountClient.LoginWithPasskeyAsync(credentialJson);
-            
-            if (loginResult.Success)
+            if (!optionsResult.Success || string.IsNullOrEmpty(optionsResult.Data))
             {
-                if (AuthStateProvider is IdentityAuthenticationStateProvider customProvider)
+                // Fail silently: Server might not support discoverable credentials 
+                // or the network is down. User can still use password.
+                return;
+            }
+
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
+
+            // 2. Trigger the OS biometric prompt
+            // Use a timeout or mediation 'conditional' in JS to prevent blocking the UI
+            var credentialJson = await module.InvokeAsync<string>("authenticatePasskeyImmediate", optionsResult.Data);
+
+            if (!string.IsNullOrEmpty(credentialJson))
+            {
+                // 3. Verify signature and log in
+                var loginResult = await AccountClient.LoginWithPasskeyAsync(credentialJson);
+
+                if (loginResult.Success)
                 {
-                    // Update UI state before navigating
-                    customProvider.NotifyUserAuthentication("PasskeyUser");
+                    if (AuthStateProvider is IdentityAuthenticationStateProvider customProvider)
+                    {
+                        // Update UI state before navigating
+                        customProvider.NotifyUserAuthentication("PasskeyUser");
+                    }
+
+                    Navigation.NavigateTo("/", forceLoad: true);
                 }
-                Navigation.NavigateTo("/", forceLoad: true);
             }
         }
-    }
-    catch (JSException jsEx)
-    {
-        // Handle common Browser/Hardware errors
-        if (jsEx.Message.Contains("NotAllowedError"))
+        catch (JSException jsEx)
         {
-            // User cancelled the prompt or timed out. 
-            // We do nothing so they can still see the manual login form.
-            Console.WriteLine("Biometric prompt ignored by user.");
+            // Handle common Browser/Hardware errors
+            if (jsEx.Message.Contains("NotAllowedError"))
+            {
+                // User cancelled the prompt or timed out. 
+                // We do nothing so they can still see the manual login form.
+                Console.WriteLine("Biometric prompt ignored by user.");
+            }
+            else if (jsEx.Message.Contains("SecurityError"))
+            {
+                _errorMessage = "Biometrics unavailable. Check your device settings.";
+            }
         }
-        else if (jsEx.Message.Contains("SecurityError"))
+        catch (Exception ex)
         {
-            _errorMessage = "Biometrics unavailable. Check your device settings.";
+            // Infrastructure errors (API down, etc.)
+
+            // We don't show an alert here because it's an 'auto' background task.
+            // Let the user use the manual buttons instead.
         }
     }
-    catch (Exception ex)
-    {
-        // Infrastructure errors (API down, etc.)
-  
-        // We don't show an alert here because it's an 'auto' background task.
-        // Let the user use the manual buttons instead.
-    }
-}
 
     private async Task HandlePasswordLogin()
     {
@@ -144,7 +149,7 @@ private async Task TriggerImmediateBiometricPrompt()
         }
 
         _isProcessing = true;
-        
+
         try
         {
             // 1. Call your existing Password Login API
@@ -152,14 +157,6 @@ private async Task TriggerImmediateBiometricPrompt()
 
             if (response.Success)
             {
-                // 2. Notify your AuthStateProvider (as you did with FaceID)
-                // if (AuthStateProvider is IdentityAuthenticationStateProvider customProvider)
-                // {
-                //     customProvider.NotifyUserAuthentication(_email);
-                // }
-
-                // 3. Redirect to the Manage Passkeys page
-                // The standard .NET 10 Identity path is "Account/Manage/Passkeys"
                 Navigation.NavigateTo("manage-passkeys", forceLoad: true);
             }
             else
@@ -170,10 +167,15 @@ private async Task TriggerImmediateBiometricPrompt()
         catch (Exception ex)
         {
             _errorMessage = "Login failed. Please try again.";
+
             Console.WriteLine(ex.Message);
         }
-        finally { _isProcessing = false; }
+        finally
+        {
+            _isProcessing = false;
+        }
     }
+
     private async Task HandlePasskeyLogin()
     {
         try
@@ -193,15 +195,12 @@ private async Task TriggerImmediateBiometricPrompt()
             {
                 Navigation.NavigateTo("/");
             }
-            else
-            {
-            
-            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Login failed: {ex.Message}");
         }
     }
+
 }
 

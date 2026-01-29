@@ -1,5 +1,5 @@
 @page "/"
-@attribute [Authorize]
+@attribute [AllowAnonymous]
 @inject StateContainer StateContainer
 @inject ISeizureTrackerService SeizureTrackerService
 @inject IJSRuntime JSRuntime
@@ -16,13 +16,13 @@
     else
     {
         <button @onclick="() => Submit(Enums.SeizureTypes.Simple)" type="submit"
-                class="btn btn-outline-danger btn-lg my-3">Simple
+                class="btn btn-outline-danger btn-seizure btn-neon btn-simple btn-lg my-3">Simple
         </button>
         <button @onclick="() => Submit(Enums.SeizureTypes.Complex)" type="submit"
-                class="btn btn-outline-warning btn-lg my-3">Complex
+                class="btn btn-outline-warning btn-seizure btn-neon btn-complex btn-lg my-3">Complex
         </button>
         <button @onclick="() => Submit(Enums.SeizureTypes.Reflex)" type="submit"
-                class="btn btn-outline-info btn-lg my-3">Reflex
+                class="btn btn-outline-info btn-lg btn-seizure btn-neon btn-reflex my-3">Reflex
         </button>
     }
     <ToasterComponent TextColor="@_toasterTextColor" BorderColor="@_toasterBorderColor" ToasterMessage="@_toasterMessage"></ToasterComponent>

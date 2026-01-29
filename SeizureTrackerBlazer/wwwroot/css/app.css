@@ -1,5 +1,5 @@
 html, body, #app {
-    background-color: black;
+    background-color: #121212;
     color: white;
 }
 
@@ -10,6 +10,7 @@ nav.navbar.navbar-dark.bg-dark {
 .log-button-container .btn {
     font-size: 2.25rem !important;
 }
+
 .toaster-snippet {
     position: fixed;
     bottom: 0;
@@ -112,3 +113,107 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Avoid pure black (#000000) for less eye strain */
+.bg-app-dark-optimized {
+    background-color: #121212;
+}
+
+/* Base style for all buttons */
+.btn-seizure {
+    /* Use strong padding for easily tappable areas (WCAG recommendation) */
+    padding: 1.5rem 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-width: 2px;
+    border-style: solid;
+    transition: background-color 0.2s, border-color 0.2s;
+    /* Use off-white text instead of pure white */
+    color: #e0e0e0;
+}
+
+/* 1. Simple Button: Desaturated Red */
+.btn-simple {
+    background-color: #3b2528; /* Muted background */
+    border-color: #cf6679; /* Accent border */
+}
+
+.btn-simple:hover {
+    background-color: #cf6679;
+    color: #121212;
+}
+
+/* 2. Complex Button: Desaturated Yellow */
+.btn-complex {
+    background-color: #3b3523;
+    border-color: #fce83a;
+}
+
+.btn-complex:hover {
+    background-color: #fce83a;
+    color: #121212;
+}
+
+/* 3. Reflex Button: Desaturated Cyan */
+.btn-reflex {
+    background-color: #213c3c;
+    border-color: #00bcd4;
+}
+
+.btn-reflex:hover {
+    background-color: #00bcd4;
+    color: #121212;
+}
+
+/* Optimized Navbar to match new dark background */
+.navbar {
+    background-color: #1a1a1a !important; /* Slightly lighter than main background for hierarchy */
+    border-color: #444 !important;
+}
+
+/* Ensure the button visually reacts the moment a user taps it */
+.btn-neon:active {
+    filter: brightness(1.5); /* Make it glow brighter immediately */
+    transform: scale(0.95); /* Scale down slightly to confirm the tap */
+    box-shadow: 0 0 20px currentColor, inset 0 0 15px currentColor; /* Enhance the glow */
+    transition: none; /* Make the feedback immediate, not animated */
+}
+
+/* Optional: To make sure :hover effects don't fire awkwardly on devices that support both touch and mouse */
+@media (hover: none) {
+    .btn-neon:hover {
+        /* Reset hover effects on touch-only devices */
+        filter: none;
+        transform: none;
+        box-shadow: initial;
+    }
+}
+
+.navbar-toggler {
+    border-color: #00ffff !important;
+    border-width: 1px;
+}
+
+/* Change the default lines to match your brand color */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org' viewBox='0 0 30 30'%3e%3cpath stroke='%2300ffff' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:focus-visible {
+    outline: 2px solid #00ffff !important;
+    outline-offset: 2px;
+    box-shadow: none !important;
+}
+
+.animated-toggler {
+    transition: transform 0.3s ease-in-out;
+    /* (Include your custom background-image SVG code here if you used it) */
+}
+
+/* Rotate the icon container 90 degrees when the menu is open */
+.animated-toggler.is-open {
+    transform: rotate(90deg);
+}
+
+
