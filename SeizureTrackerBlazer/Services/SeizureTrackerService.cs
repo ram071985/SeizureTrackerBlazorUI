@@ -7,21 +7,20 @@ namespace SeizureTrackerBlazer.Services;
 public class SeizureTrackerService : ISeizureTrackerService
 {
     private readonly HttpClient _client;
-    private readonly string? _apiBaseAddress;
-    private readonly string? _apiName;
+    private readonly string? _route; 
 
-    public SeizureTrackerService(IConfiguration config, HttpClient client)
+    public SeizureTrackerService(HttpClient client, IConfiguration config)
     {
-        _client = _client;
+        _client = client;
+        _route = config[AppSettings.TrackerApiRoute]?.TrimStart('/') ?? "";
     }
 
     public async Task<List<SeizureActivityHeader>> GetActivityHeaders()
     {
-        var uri = $"{_apiName}/{ApiEndpoints.GetHeaders}";
-        
+        var path = $"{_route}";
         try
         {
-            var response = await _client.GetAsync(uri);
+            var response = await _client.GetAsync(ApiEndpoints.GetHeaders);
             
             return JsonSerializer.Deserialize<List<SeizureActivityHeader>>(await response.Content.ReadAsStringAsync());
         }
@@ -35,7 +34,7 @@ public class SeizureTrackerService : ISeizureTrackerService
     
     public async Task<List<SeizureActivityDetail>> GetActivityDetailsByHeaderId(int headerId)
     {
-        var uri = $"{_apiName}/{ApiEndpoints.GetDetailsByHeaderId}/{headerId}";
+        var uri = $"{ApiEndpoints.GetDetailsByHeaderId}/{headerId}";
         try
         {
             var response = await _client.GetAsync(uri);
@@ -52,9 +51,10 @@ public class SeizureTrackerService : ISeizureTrackerService
 
     public async Task AddSeizureActivityLog(string body)
     {
+       
         try
         {
-            await _client.PostAsync(_apiName, new StringContent(body, System.Text.Encoding.UTF8, "application/json"));
+            await _client.PostAsync(_route, new StringContent(body, System.Text.Encoding.UTF8, "application/json"));
         }
         catch (Exception ex)
         {

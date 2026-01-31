@@ -1,181 +1,181 @@
-﻿@* @page "/" *@
-@using System.Text.Json
-@attribute [Authorize]
-@inject StateContainer StateContainer
-@inject ISeizureTrackerService SeizureTrackerService
-
-
-<PageTitle>Seizure Log</PageTitle>
-<div class="container flex py-5">
-@*     <EditForm EditContext="@_editContext" class="row justify-content-center" OnValidSubmit="Submit" *@
-@*               FormName="SeizureLog"> *@
-@*         <div class="col-md-3"> *@
-@*             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Text" *@
-@*                             LabelText="@InputLabels.SeizureDescription" *@
-@*                             @bind-Value="@Model!.SeizureDescription" *@
-@*             /> *@
-@*         </div> *@
-@*         <div class="col-md-3"> *@
-@*             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.DateTime" *@
-@*                             LabelText="@InputLabels.DateAndTime" *@
-@*                             @bind-Value="@Model!.SeizureDate"/> *@
-@*         </div> *@
-@*         <div class="col-md-4 py-4"> *@
-@*             <InputComponent Value="@Model!.SeizureType" ValueChanged="OnSeizureTypeSelectChange" *@
-@*                             SelectItems="@StateContainer.SeizureType" *@
-@*                             OptionLabel="@OptionLabels.SeizureType" *@
-@*                             InputType="@InputTypes.Select" LabelText="@AriaLabels.SeizureType" *@
-@*             /> *@
-@*             @foreach (var type in _seizureTypesSelected) *@
+﻿@* $1$ @page "/" #1# *@
+@* @using System.Text.Json *@
+@* @attribute [Authorize] *@
+@* @inject StateContainer StateContainer *@
+@* @inject ISeizureTrackerService SeizureTrackerService *@
+@* *@
+@* *@
+@* <PageTitle>Seizure Log</PageTitle> *@
+@* <div class="container flex py-5"> *@
+@* $1$     <EditForm EditContext="@_editContext" class="row justify-content-center" OnValidSubmit="Submit" #1# *@
+@* $1$               FormName="SeizureLog"> #1# *@
+@* $1$         <div class="col-md-3"> #1# *@
+@* $1$             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Text" #1# *@
+@* $1$                             LabelText="@InputLabels.SeizureDescription" #1# *@
+@* $1$                             @bind-Value="@Model!.SeizureDescription" #1# *@
+@* $1$             /> #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-3"> #1# *@
+@* $1$             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.DateTime" #1# *@
+@* $1$                             LabelText="@InputLabels.DateAndTime" #1# *@
+@* $1$                             @bind-Value="@Model!.SeizureDate"/> #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-4 py-4"> #1# *@
+@* $1$             <InputComponent Value="@Model!.SeizureType" ValueChanged="OnSeizureTypeSelectChange" #1# *@
+@* $1$                             SelectItems="@StateContainer.SeizureType" #1# *@
+@* $1$                             OptionLabel="@OptionLabels.SeizureType" #1# *@
+@* $1$                             InputType="@InputTypes.Select" LabelText="@AriaLabels.SeizureType" #1# *@
+@* $1$             /> #1# *@
+@* $1$             @foreach (var type in _seizureTypesSelected) #1# *@
+@* $1$             { #1# *@
+@* $1$                 <span class="badge rounded-pill text-bg-info align-items-center">@type<i #1# *@
+@* $1$                         onclick="@(() => RemoveSeizureType(type))" #1# *@
+@* $1$                         class="bi bi-x-circle-fill fs-6 ms-2" #1# *@
+@* $1$                         role="button"></i></span> #1# *@
+@* $1$             } #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-3"> #1# *@
+@* $1$             <InputComponent InputType="@InputTypes.Select" ValueChanged="OnSeizureIntensitySelectChange" #1# *@
+@* $1$                             InputDataType="@InputDataTypes.Number" #1# *@
+@* $1$                             LabelText="@InputLabels.Intensity" #1# *@
+@* $1$                             SelectItems="Enumerable.Range(1, 10) #1# *@
+@* $1$                                 .Select(i => i.ToString()) #1# *@
+@* $1$                                 .ToList()" #1# *@
+@* $1$                             Value="@Model.SeizureIntensity" Placeholder="@PlaceholderLabels.Intensity"/> #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-3"> #1# *@
+@* $1$             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Number" #1# *@
+@* $1$                             LabelText="@InputLabels.SleepAmount" #1# *@
+@* $1$                             DecimalStep="0.1" #1# *@
+@* $1$                             DecimalMin="0.0" #1# *@
+@* $1$                             DecimalMax="24.0" #1# *@
+@* $1$                             @bind-Value="@Model!.SleepAmount"/> #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-3"> #1# *@
+@* $1$             <InputComponent LabelText="@InputLabels.MedicationChange" #1# *@
+@* $1$                             SelectItems="@StateContainer.MedicationChange" #1# *@
+@* $1$                             InputType="@InputTypes.Select" #1# *@
+@* $1$                             OptionLabel="@OptionLabels.MedChange" #1# *@
+@* $1$                             @bind-Value="@Model!.MedicationChange"/> #1# *@
+@* $1$             @foreach (var item in _medicationChangeSelectItems) #1# *@
+@* $1$             { #1# *@
+@* $1$                 <option value="@item">@item</option> #1# *@
+@* $1$             } #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-3"> #1# *@
+@* $1$             <InputComponent LabelText="@InputLabels.MedicationChangeDescription" #1# *@
+@* $1$                             InputType="@InputTypes.TextArea" #1# *@
+@* $1$                             @bind-Value="@Model!.MedicationChangeDescription"/> #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-3"> #1# *@
+@* $1$             <InputComponent LabelText="@InputLabels.Notes" #1# *@
+@* $1$                             InputType="@InputTypes.TextArea" #1# *@
+@* $1$                             @bind-Value="@Model!.Notes"/> #1# *@
+@* $1$         </div> #1# *@
+@* $1$         <div class="col-md-4"> #1# *@
+@* $1$             <button type="submit" class="btn btn-primary btn-lg">Submit</button> #1# *@
+@* $1$         </div> #1# *@
+@* $1$     </EditForm> #1# *@
+@* </div> *@
+@* *@
+@* @code *@
+@* { *@
+@*     private bool _showMultiSelect; *@
+@*     private string _multiSelectText; *@
+@*     private string _seizureTypeInput; *@
+@*     private EditContext? _editContext; *@
+@*     private ValidationMessageStore _messageStore; *@
+@*     private List<string> _seizureTypesSelected; *@
+@*     private List<string> _medicationChangeSelectItems = new List<string>() { "Yes", "No" }; *@
+@* *@
+@*     [Parameter] public EventCallback<string> OnInputCallback { get; set; } *@
+@*     [SupplyParameterFromForm] private SeizureActivityLog? Model { get; set; } *@
+@* *@
+@* *@
+@*     protected override void OnInitialized() *@
+@*     { *@
+@*         Model ??= new(); *@
+@*         StateContainer.EditContext = new(Model); *@
+@*         _editContext = StateContainer.EditContext; *@
+@*         _editContext.OnValidationRequested += HandleValidationRequested; *@
+@*         _messageStore = new(_editContext); *@
+@*         StateContainer.OnChange += StateHasChanged; *@
+@*         _multiSelectText = UIConstants.MultiSelectShowText; *@
+@*         _seizureTypesSelected = new(); *@
+@*         // Model!.SleepAmount = "0.0"; *@
+@*     } *@
+@* *@
+@*     protected override void OnParametersSet() *@
+@*     { *@
+@*     } *@
+@* *@
+@*     protected override void OnAfterRender(bool firstRender) *@
+@*     { *@
+@*     } *@
+@* *@
+@*     internal void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args) *@
+@*     { *@
+@*         _messageStore?.Clear(); *@
+@* *@
+@*         // Custom validation logic *@
+@*         // if (!Model!?.Options) *@
+@*         // { *@
+@*         //     _messageStore?.Add(() => Model.Options, "Select at least one."); *@
+@*         // } *@
+@*     } *@
+@* *@
+@*     public void Dispose() *@
+@*     { *@
+@*         StateContainer.OnChange -= StateHasChanged; *@
+@*     } *@
+@* *@
+@* *@
+@*     private async Task Submit() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             var activityLog = new SeizureActivityLog *@
 @*             { *@
-@*                 <span class="badge rounded-pill text-bg-info align-items-center">@type<i *@
-@*                         onclick="@(() => RemoveSeizureType(type))" *@
-@*                         class="bi bi-x-circle-fill fs-6 ms-2" *@
-@*                         role="button"></i></span> *@
-@*             } *@
-@*         </div> *@
-@*         <div class="col-md-3"> *@
-@*             <InputComponent InputType="@InputTypes.Select" ValueChanged="OnSeizureIntensitySelectChange" *@
-@*                             InputDataType="@InputDataTypes.Number" *@
-@*                             LabelText="@InputLabels.Intensity" *@
-@*                             SelectItems="Enumerable.Range(1, 10) *@
-@*                                 .Select(i => i.ToString()) *@
-@*                                 .ToList()" *@
-@*                             Value="@Model.SeizureIntensity" Placeholder="@PlaceholderLabels.Intensity"/> *@
-@*         </div> *@
-@*         <div class="col-md-3"> *@
-@*             <InputComponent InputType="@InputTypes.Input" InputDataType="@InputDataTypes.Number" *@
-@*                             LabelText="@InputLabels.SleepAmount" *@
-@*                             DecimalStep="0.1" *@
-@*                             DecimalMin="0.0" *@
-@*                             DecimalMax="24.0" *@
-@*                             @bind-Value="@Model!.SleepAmount"/> *@
-@*         </div> *@
-@*         <div class="col-md-3"> *@
-@*             <InputComponent LabelText="@InputLabels.MedicationChange" *@
-@*                             SelectItems="@StateContainer.MedicationChange" *@
-@*                             InputType="@InputTypes.Select" *@
-@*                             OptionLabel="@OptionLabels.MedChange" *@
-@*                             @bind-Value="@Model!.MedicationChange"/> *@
-@*             @foreach (var item in _medicationChangeSelectItems) *@
-@*             { *@
-@*                 <option value="@item">@item</option> *@
-@*             } *@
-@*         </div> *@
-@*         <div class="col-md-3"> *@
-@*             <InputComponent LabelText="@InputLabels.MedicationChangeDescription" *@
-@*                             InputType="@InputTypes.TextArea" *@
-@*                             @bind-Value="@Model!.MedicationChangeDescription"/> *@
-@*         </div> *@
-@*         <div class="col-md-3"> *@
-@*             <InputComponent LabelText="@InputLabels.Notes" *@
-@*                             InputType="@InputTypes.TextArea" *@
-@*                             @bind-Value="@Model!.Notes"/> *@
-@*         </div> *@
-@*         <div class="col-md-4"> *@
-@*             <button type="submit" class="btn btn-primary btn-lg">Submit</button> *@
-@*         </div> *@
-@*     </EditForm> *@
-</div>
-
-@code
-{
-    private bool _showMultiSelect;
-    private string _multiSelectText;
-    private string _seizureTypeInput;
-    private EditContext? _editContext;
-    private ValidationMessageStore _messageStore;
-    private List<string> _seizureTypesSelected;
-    private List<string> _medicationChangeSelectItems = new List<string>() { "Yes", "No" };
-
-    [Parameter] public EventCallback<string> OnInputCallback { get; set; }
-    [SupplyParameterFromForm] private SeizureActivityLog? Model { get; set; }
-
-
-    protected override void OnInitialized()
-    {
-        Model ??= new();
-        StateContainer.EditContext = new(Model);
-        _editContext = StateContainer.EditContext;
-        _editContext.OnValidationRequested += HandleValidationRequested;
-        _messageStore = new(_editContext);
-        StateContainer.OnChange += StateHasChanged;
-        _multiSelectText = UIConstants.MultiSelectShowText;
-        _seizureTypesSelected = new();
-        // Model!.SleepAmount = "0.0";
-    }
-
-    protected override void OnParametersSet()
-    {
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-    }
-
-    internal void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
-    {
-        _messageStore?.Clear();
-
-        // Custom validation logic
-        // if (!Model!?.Options)
-        // {
-        //     _messageStore?.Add(() => Model.Options, "Select at least one.");
-        // }
-    }
-
-    public void Dispose()
-    {
-        StateContainer.OnChange -= StateHasChanged;
-    }
-
-
-    private async Task Submit()
-    {
-        try
-        {
-            var activityLog = new SeizureActivityLog
-            {
-                SeizureDescription = Model?.SeizureDescription,
-                SeizureDate = Model?.SeizureDate,
-                SeizureType = Model?.SeizureType,
-                // SleepAmount = Model?.SleepAmount,
-                // SeizureIntensity = Model?.SeizureIntensity,
-                // MedicationChange = Model?.MedicationChange,
-                // MedicationChangeDescription = Model?.MedicationChangeDescription,
-                // Notes = Model?.Notes
-            };
-
-            await SeizureTrackerService.AddSeizureActivityLog(JsonSerializer.Serialize(activityLog));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-
-            throw;
-        }
-    }
-
-    private void OnSeizureTypeSelectChange(string value)
-    {
-        _seizureTypesSelected.Add(value);
-
-        Model!.SeizureType = string.Join(",", _seizureTypesSelected);
-
-        StateHasChanged();
-    }
-
-    private void OnSeizureIntensitySelectChange(string value)
-    {
-        // Model!.SeizureIntensity = value;
-    }
-
-    private void RemoveSeizureType(string type)
-    {
-        var index = _seizureTypesSelected.IndexOf(type);
-
-        _seizureTypesSelected.RemoveAt(index);
-
-        StateHasChanged();
-    }
-}
+@*                 SeizureDescription = Model?.SeizureDescription, *@
+@*                 SeizureDate = Model?.SeizureDate, *@
+@*                 SeizureType = Model?.SeizureType, *@
+@*                 // SleepAmount = Model?.SleepAmount, *@
+@*                 // SeizureIntensity = Model?.SeizureIntensity, *@
+@*                 // MedicationChange = Model?.MedicationChange, *@
+@*                 // MedicationChangeDescription = Model?.MedicationChangeDescription, *@
+@*                 // Notes = Model?.Notes *@
+@*             }; *@
+@* *@
+@*             await SeizureTrackerService.AddSeizureActivityLog(JsonSerializer.Serialize(activityLog)); *@
+@*         } *@
+@*         catch (Exception ex) *@
+@*         { *@
+@*             Console.WriteLine(ex); *@
+@* *@
+@*             throw; *@
+@*         } *@
+@*     } *@
+@* *@
+@*     private void OnSeizureTypeSelectChange(string value) *@
+@*     { *@
+@*         _seizureTypesSelected.Add(value); *@
+@* *@
+@*         Model!.SeizureType = string.Join(",", _seizureTypesSelected); *@
+@* *@
+@*         StateHasChanged(); *@
+@*     } *@
+@* *@
+@*     private void OnSeizureIntensitySelectChange(string value) *@
+@*     { *@
+@*         // Model!.SeizureIntensity = value; *@
+@*     } *@
+@* *@
+@*     private void RemoveSeizureType(string type) *@
+@*     { *@
+@*         var index = _seizureTypesSelected.IndexOf(type); *@
+@* *@
+@*         _seizureTypesSelected.RemoveAt(index); *@
+@* *@
+@*         StateHasChanged(); *@
+@*     } *@
+@* } *@

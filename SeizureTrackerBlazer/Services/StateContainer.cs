@@ -13,7 +13,7 @@ namespace SeizureTrackerBlazer.Services
         private List<string> _seizureTypes;
         private EditContext? _editContext;
         private List<string> _medicationChange;
-        private SeizureTrackerService _seizureTrackerService;
+        private readonly ISeizureTrackerService _seizureTrackerService;
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace SeizureTrackerBlazer.Services
 
         #region Construction
 
-        public StateContainer(IConfiguration config, HttpClient client)
+        public StateContainer(IConfiguration config, HttpClient client, ISeizureTrackerService seizureTrackerService)
         {
             _seizureTypes = new List<string>
             {
@@ -66,7 +66,7 @@ namespace SeizureTrackerBlazer.Services
                 { MedChange.No },
             };
 
-            _seizureTrackerService = new SeizureTrackerService(config, client);
+            _seizureTrackerService = seizureTrackerService;
         }
         
         public async Task<List<SeizureActivityHeader>> GetActivityHeaders()

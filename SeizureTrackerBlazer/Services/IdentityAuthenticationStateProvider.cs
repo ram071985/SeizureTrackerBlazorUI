@@ -8,6 +8,7 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly AccountClient _client;
     private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
+    private AuthenticationState _cachedState; // Store it here!
 
     public IdentityAuthenticationStateProvider(AccountClient client)
     {
@@ -17,24 +18,36 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
     // This is called by Blazor whenever it needs to know if the user is authorized
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
+        // 1. If we already have a logged-in user in memory, return it. No API call!
+        if (_cachedState != null && _cachedState.User.Identity.IsAuthenticated)
+        {
+            return _cachedState;
+        }
+
         try
         {
             // .NET 10 Identity API includes an /info endpoint to get user data
             var userResponse = await _client.GetUserInfoAsync();
-            
+
             if (userResponse.Data == null || !userResponse.Data.IsAuthenticated)
             {
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
-            if (userResponse != null)
-            {
-                var identity = new ClaimsIdentity([
-                    new Claim(ClaimTypes.Email, userResponse.Data.Email),
-                    new Claim(ClaimTypes.NameIdentifier, userResponse.Data.UserId)
-                ], "Identity.Application");
 
-                return new AuthenticationState(new ClaimsPrincipal(identity));
+            var claims = new List<Claim>();
+
+            foreach (var role in userResponse.Data.Roles)
+            {
+                // This maps the string "WhitelistedUser" back to a proper .NET Role Claim
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
+
+            claims.Add(new Claim(ClaimTypes.Email, userResponse.Data.Email));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, userResponse.Data.UserId));
+
+            var identity = new ClaimsIdentity(claims, "Identity.Application");
+
+            return new AuthenticationState(new ClaimsPrincipal(identity));
         }
         catch (Exception)
         {
@@ -51,7 +64,7 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
         var user = new ClaimsPrincipal(identity);
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
-    
+
     public void NotifyUserLogout()
     {
         var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());

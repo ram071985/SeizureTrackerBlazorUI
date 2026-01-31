@@ -13,15 +13,18 @@ builder.Configuration.AddEnvironmentVariables();
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddHttpClient<ISeizureTrackerService, SeizureTrackerService>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration[AppSettings.ApiBaseAddress]);
-});
-
 builder.Services.AddTransient<CookieHandler>();
 
 builder.Services.AddHttpClient<AccountClient>(client =>
     {
+        client.BaseAddress = new Uri(builder.Configuration[AppSettings.ApiBaseAddress]);
+    })
+    .AddHttpMessageHandler<CookieHandler>();
+
+builder.Services.AddHttpClient<ISeizureTrackerService, SeizureTrackerService>(client =>
+    {
+
+
         client.BaseAddress = new Uri(builder.Configuration[AppSettings.ApiBaseAddress]);
     })
     .AddHttpMessageHandler<CookieHandler>();

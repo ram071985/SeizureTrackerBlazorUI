@@ -1,10 +1,7 @@
 @page "/"
 @attribute [AllowAnonymous]
 @inject StateContainer StateContainer
-@inject ISeizureTrackerService SeizureTrackerService
 @inject IJSRuntime JSRuntime
-@using System.Linq.Expressions
-@using Constants
 
 <div class="container log-button-container d-flex justify-content-center align-items-center flex-column py-5 my-5">
     @if (_submitting)
