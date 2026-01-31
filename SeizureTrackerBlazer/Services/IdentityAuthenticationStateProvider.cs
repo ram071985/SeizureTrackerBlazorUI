@@ -34,27 +34,26 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
 
-            var claims = new List<Claim>();
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.Email, userResponse.Data.Email),
+                new(ClaimTypes.NameIdentifier, userResponse.Data.UserId)
+            };
 
             foreach (var role in userResponse.Data.Roles)
             {
-                // This maps the string "WhitelistedUser" back to a proper .NET Role Claim
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            claims.Add(new Claim(ClaimTypes.Email, userResponse.Data.Email));
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, userResponse.Data.UserId));
-
             var identity = new ClaimsIdentity(claims, "Identity.Application");
-
-            return new AuthenticationState(new ClaimsPrincipal(identity));
+            _cachedState = new AuthenticationState(new ClaimsPrincipal(identity));
         }
         catch (Exception)
         {
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
-        return new AuthenticationState(_anonymous);
+        return _cachedState;
     }
 
     // Call this after a successful Passkey login to refresh the UI

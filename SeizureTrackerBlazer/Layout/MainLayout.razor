@@ -1,15 +1,15 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    @* <AuthorizeView> *@
-    @*     <Authorized> *@
+    <AuthorizeView>
+        <Authorized>
             @* Show the separate NavMenu component only when logged in *@
             <Navbar/>
 
 
-        @* </Authorized> *@
-        @* *@
-        @* <NotAuthorized> *@
+        </Authorized>
+        
+        <NotAuthorized>
             @* 
                Login.razor is rendered here via @Body. 
                We omit the NavMenu so the biometric prompt is the focus.
@@ -19,7 +19,7 @@
                     @Body
                 </article>
             </main>
-    @*     </NotAuthorized> *@
-    @* </AuthorizeView> *@
+        </NotAuthorized>
+    </AuthorizeView>
 </div>
 
