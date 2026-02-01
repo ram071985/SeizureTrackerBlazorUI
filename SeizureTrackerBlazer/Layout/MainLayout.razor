@@ -5,8 +5,12 @@
         <Authorized>
             @* Show the separate NavMenu component only when logged in *@
             <Navbar/>
-
-
+            
+            <main class="container py-4">
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
         </Authorized>
         
         <NotAuthorized>
@@ -14,12 +18,26 @@
                Login.razor is rendered here via @Body. 
                We omit the NavMenu so the biometric prompt is the focus.
             *@
-            <main class="container py-4">
-                <article class="content px-4">
-                    @Body
-                </article>
+
+            <main class="container mt-5">
+                @Body
             </main>
         </NotAuthorized>
     </AuthorizeView>
 </div>
 
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+}
