@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <!-- Ensures fonts are included in the publish output -->
-        <Content Include="wwwroot/css/fonts/*" CopyToPublishDirectory="PreserveNewest" />
+        <Content Update="wwwroot/css/fonts/*" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
     
     <ItemGroup>
