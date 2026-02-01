@@ -5,7 +5,11 @@
         <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+        <!-- RE-ENABLE the system so the build doesn't crash -->
+        <StaticWebAssetsEnabled>true</StaticWebAssetsEnabled>
+
+        <!-- BUT DISABLE the fingerprinting that causes the 404s -->
+        <StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
     </PropertyGroup>
 
     <ItemGroup>
