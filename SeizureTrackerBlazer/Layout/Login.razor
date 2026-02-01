@@ -61,7 +61,7 @@
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            if (AuthState. _enableAutomaticPasskeyPrompt)
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
             {
                 // User is already logged in (likely from the forceLoad reload)
                 // Redirect them to the dashboard and exit
