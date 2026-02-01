@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
 @inject AccountClient AccountClient
+@inject AuthenticationState AuthState
 @inject IdentityAuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
@@ -60,7 +61,7 @@
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            if (user.Identity is not null && user.Identity.IsAuthenticated && _enableAutomaticPasskeyPrompt)
+            if (AuthState. _enableAutomaticPasskeyPrompt)
             {
                 // User is already logged in (likely from the forceLoad reload)
                 // Redirect them to the dashboard and exit
@@ -80,7 +81,7 @@
 
     private async Task TriggerImmediateBiometricPrompt()
     {
-        if (_enableAutomaticPasskeyPrompt) return;
+        if (!_enableAutomaticPasskeyPrompt) return;
         try
         {
             // 1. Request a "Discoverable" challenge (no email specified)
@@ -190,10 +191,12 @@
 
             // 3. Send result to API
             var loginResponseSuccess = await AccountClient.LoginWithPasskeyAsync(credentialJson);
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
 
-            if (loginResponseSuccess.Data)
+            if (user.Identity is not null && user.Identity.IsAuthenticated && loginResponseSuccess.Data)
             {
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/", forceLoad: true);
             }
         }
         catch (Exception ex)
