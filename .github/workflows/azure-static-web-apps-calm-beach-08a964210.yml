@@ -31,7 +31,7 @@ jobs:
       - name: List files for Debugging
         run: |
           ls -R release-output/wwwroot
-      - name: Inject Secrets into appsettings.Production.json
+      - name: Inject Secrets into appsettings.Development.json
         uses: microsoft/variable-substitution@v1
         with:
           # Path to the appsettings file inside your Blazor project
@@ -63,6 +63,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_CALM_BEACH_08A964210 }}
           action: "close"
+
 
 
 
