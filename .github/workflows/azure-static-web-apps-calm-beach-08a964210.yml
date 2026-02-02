@@ -35,7 +35,7 @@ jobs:
         uses: microsoft/variable-substitution@v1
         with:
           # Path to the appsettings file inside your Blazor project
-          files: 'release-output/wwwroot/appsettings.json' 
+          files: 'release-output/wwwroot/appsettings.Production.json' 
         env:
           # Ensure this matches the key in your appsettings.json
           AllowedOrigins: ${{ secrets.API_ROUTES__API_BASE_ADDRESS }}
@@ -63,6 +63,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_CALM_BEACH_08A964210 }}
           action: "close"
+
 
 
 
