@@ -54,19 +54,8 @@ export async function authenticatePasskeyImmediate(optionsJson) {
     
     currentAbortController = new AbortController();
     
-    const options = JSON.parse(optionsJson);
+    const options = PublicKeyCredential.parseRequestOptionsFromJSON(JSON.parse(optionsJson));
     
-    // 1. Convert the Challenge string to a binary ArrayBuffer
-    if (options.challenge) {
-        options.challenge = coerceToArrayBuffer(options.challenge);
-    }
-
-    // 2. Convert any existing Credential IDs to binary ArrayBuffers
-    if (options.allowCredentials) {
-        options.allowCredentials.forEach(c => {
-            c.id = coerceToArrayBuffer(c.id);
-        });
-    }
 
     try {
         const credential = await navigator.credentials.get({
