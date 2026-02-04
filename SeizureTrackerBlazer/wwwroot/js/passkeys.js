@@ -6,6 +6,11 @@
 // 1. REGISTRATION: Creates a new public key and saves it to the device/cloud
 export async function registerPasskey(optionsJson) {
     try {
+        // This will print the raw data to the browser's Console tab
+        console.log("WebAuthn Options:", optionsJson);
+
+        // You can also log the type to check if it's a String or an Object
+        console.log("Data Type:", typeof optionsJson);
         // Parse the JSON challenge received from the .NET 10 API
         const options = PublicKeyCredential.parseCreationOptionsFromJSON(JSON.parse(optionsJson));
 
