@@ -15,6 +15,9 @@
     <ItemGroup>
         <!-- Ensures fonts are included in the publish output -->
         <Content Update="wwwroot/css/fonts/*" CopyToPublishDirectory="PreserveNewest" />
+        <Content Update="wwwroot\staticwebapp.config.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
     
     <ItemGroup>
