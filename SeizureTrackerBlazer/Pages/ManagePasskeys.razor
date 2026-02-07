@@ -32,12 +32,10 @@
             // 1. Request Creation Options from API
    
             var jsonOptions = await AccountClient.GetRegisterPasskeyOptionsAsync();
-            var optionsJsonString = System.Text.Json.JsonSerializer.Serialize(jsonOptions.Data, 
-                new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
-            
+
             // 2. Trigger Browser "Create Passkey" Ceremony
             var module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/passkeys.js");
-            var credentialJson = await module.InvokeAsync<string>("registerPasskey", optionsJsonString);
+            var credentialJson = await module.InvokeAsync<string>("registerPasskey", jsonOptions.Data);
 
             // 3. Send Public Key to API to save in AspNetUserPasskeys table
             var result = await AccountClient.RegisterPasskeyFinishAsync(credentialJson);
