@@ -29,6 +29,7 @@ builder.Services.AddHttpClient<ISeizureTrackerService, SeizureTrackerService>(cl
     })
     .AddHttpMessageHandler<CookieHandler>();
 
+builder.Services.AddScoped<LocalStorageHelper>();
 builder.Services.AddSingleton<StateContainer>();
 
 builder.Services.AddAuthorizationCore();
