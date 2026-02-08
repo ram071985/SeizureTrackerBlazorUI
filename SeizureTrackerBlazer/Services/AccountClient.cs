@@ -169,6 +169,7 @@ public class AccountClient
         {
             // This call requires the user to be already logged in (Authorize attribute on server)
             // The CookieHandler will automatically include the session cookie.
+            
             var response = await _client.GetAsync("api/auth/register-options");
 
             if (response.IsSuccessStatusCode)

@@ -6,6 +6,7 @@
 @inject IdentityAuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject LocalStorageHelper LocalStorage
 
 <div class="container mt-5" style="max-width: 400px;">
     <div class="card shadow-sm p-4 text-center border-0">
@@ -56,7 +57,14 @@
         {
             _hasTriggered = true;
 
-            // 1. Check if the user is already authenticated before popping the prompt
+            var hasVisited = await LocalStorage.GetItemAsync<bool>("hasVisited");
+
+            if (!hasVisited)
+            {
+                await LocalStorage.SetItemAsync("hasVisited", true);
+                return;
+            }
+
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
@@ -67,14 +75,12 @@
                 Navigation.NavigateTo("/");
                 return;
             }
+            
+            await Task.Delay(500);
 
-            // 2. Only if they are anonymous, show the FaceID/TouchID prompt
-    
-                await Task.Delay(500);
+            await TriggerImmediateBiometricPrompt();
 
-                await TriggerImmediateBiometricPrompt();
-
-                _hasTriggered = false;
+            _hasTriggered = false;
         }
     }
 
