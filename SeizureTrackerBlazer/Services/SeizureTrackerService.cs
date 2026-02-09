@@ -63,4 +63,13 @@ public class SeizureTrackerService : ISeizureTrackerService
             throw;
         }
     }
+
+    public async Task PatchSeizureActivityDetail(object[] patchOperations)
+    {
+        var json = JsonSerializer.Serialize(patchOperations);
+        
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        
+        var response = await _client.PatchAsync(_route, content);
+    }
 }

@@ -11,6 +11,21 @@ nav.navbar.navbar-dark.bg-dark {
     font-size: 2.25rem !important;
 }
 
+/* Styling for the new clickable summary cards */
+.log-summary-entry {
+    background-color: #1a1a1a; /* Match navbar color */
+    border: 1px solid #444; /* Soft border */
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer; /* Hand cursor indicates clickability */
+    transition: background-color 0.2s;
+    border-radius: 4px;
+}
+
+.log-summary-entry:hover {
+    background-color: #2c2c2c; /* Slightly lighter on hover */
+}
+
 .toaster-snippet {
     position: fixed;
     bottom: 0;
@@ -325,14 +340,14 @@ body {
     color: #fff !important;
 }
 
-.text-biometric-details  {
+.text-biometric-details {
     color: #d1d1d6 !important; /* Lighter grey for subtle text */
 }
 
 .app-alert-info {
     background-color: #0c2c4d !important; /* Dark blue background */
-    color: #4da6ff !important;            /* Lighter blue text */
-    border-color: #007aff !important;     /* Blue border */
+    color: #4da6ff !important; /* Lighter blue text */
+    border-color: #007aff !important; /* Blue border */
     padding: 1rem 1.25rem !important;
     border-radius: 8px !important;
 }
@@ -357,7 +372,7 @@ body {
 
 .app-btn-outline-primary:hover {
     background-color: #007aff; /* Solid blue background on hover */
-    color: #fff;               /* White text on hover */
+    color: #fff; /* White text on hover */
 }
 
 /* 4. The Link Style (matches the 'Back to Home' link) */
