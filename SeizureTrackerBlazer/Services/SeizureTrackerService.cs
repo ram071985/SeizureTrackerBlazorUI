@@ -67,7 +67,7 @@ public class SeizureTrackerService : ISeizureTrackerService
 
     public async Task PatchSeizureActivityDetail(SeizureActivityDetail seizureActivityDetail)
     {
-        var path = $"{_route}/{ApiEndpoints.Details}/{seizureActivityDetail.LogId}";
+        var path = $"{_route}/{ApiEndpoints.LogDetails}";
         
         try
         {

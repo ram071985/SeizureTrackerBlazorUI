@@ -17,6 +17,7 @@ namespace SeizureTrackerBlazer.Constants
     {
         internal const string GetHeaders = "headers";
         internal const string Details = "details";
+        internal const string LogDetails = "log-details";
     }
 
     internal static class MedChange
