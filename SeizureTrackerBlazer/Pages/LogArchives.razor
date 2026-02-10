@@ -42,20 +42,22 @@
     <div class="content-container">
         <h3 class="page-title text-info">Seizure Log Archives</h3>
         <p class="text-secondary">Select a day to view detailed logs.</p>
-
-        <!-- Loop through daily summaries here in C# -->
-        @foreach (var daySummary in DailySummaries)
+        @if (_headers.Count > 0)
         {
-            <!-- Make the entire div clickable and styled like a card -->
-            <div class="log-summary-entry shadow-sm" @onclick="() => NavigateToDay(daySummary.Date)">
-                <div class="d-flex justify-content-between align-items-center">
-                    <!-- Date formatted cleanly -->
-                    <span class="log-date h5 mb-0">@daySummary.Date.ToString("MMM dd, yyyy")</span>
-                    
-                    <!-- Summary count on the right -->
-                    <span class="badge bg-info text-dark">@daySummary.TotalSeizures Seizures</span>
+            <!-- Loop through daily summaries here in C# -->
+            foreach (var header in _headers)
+            {
+                <!-- Make the entire div clickable and styled like a card -->
+                <div class="log-summary-entry shadow-sm" @onclick="() => NavigateToDay(header.Id)">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Date formatted cleanly -->
+                        <span class="log-date h5 mb-0">@header.Date</span>
+
+                        <!-- Summary count on the right -->
+                        <span class="badge bg-info text-dark">@header.DailyTotal Seizures</span>
+                    </div>
                 </div>
-            </div>
+            }
         }
     </div>
 </div>

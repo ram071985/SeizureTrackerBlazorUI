@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using SeizureTrackerBlazer.Models;
 using SeizureTrackerBlazer.Services;
 
 namespace SeizureTrackerBlazer.Pages;
@@ -6,19 +7,19 @@ namespace SeizureTrackerBlazer.Pages;
 public partial class LogArchives : ComponentBase
 {
     [Inject] private NavigationManager Navigation { get; set; }
+    [Inject] private ISeizureTrackerService SeizureTrackerService { get; set; }
+    
+    private List<SeizureActivityHeader> _headers = [];
 
-    private List<DailySummary> DailySummaries = new List<DailySummary>
+    protected override async Task OnInitializedAsync()
     {
-        // Replace this with data fetched from your database
-        new DailySummary { Date = new DateTime(2026, 2, 7), TotalSeizures = 3 },
-        new DailySummary { Date = new DateTime(2026, 2, 5), TotalSeizures = 1 },
-        new DailySummary { Date = new DateTime(2026, 2, 3), TotalSeizures = 2 }
-    };
+        _headers = await SeizureTrackerService.GetActivityHeaders();
+    }
 
-    private void NavigateToDay(DateTime date)
+    private void NavigateToDay(int id)
     {
         // Pass the selected date to the detail page route
-        Navigation.NavigateTo($"/day-details/{date:yyyy-MM-dd}");
+        Navigation.NavigateTo($"/day-details/{id}");
     }
 
     public class DailySummary

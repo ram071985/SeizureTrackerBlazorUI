@@ -16,7 +16,7 @@ namespace SeizureTrackerBlazer.Constants
     internal static class ApiEndpoints
     {
         internal const string GetHeaders = "headers";
-        internal const string GetDetailsByHeaderId = "details";
+        internal const string Details = "details";
     }
 
     internal static class MedChange

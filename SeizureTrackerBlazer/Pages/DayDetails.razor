@@ -1,7 +1,8 @@
-@page "/day-details/{Id}"
+@page "/day-details/{Id:int}"
 @attribute [Authorize]
 @inject NavigationManager Navigation
 @inject ISeizureTrackerService SeizureTrackerService
+@inject LocalStorageHelper LocalStorageHelper
 
 <div class="app-screen">
     <div class="content-container">
@@ -10,66 +11,67 @@
         </button>
 
         <h3 class="page-title text-info">Logs for @DisplayDate.ToString("MMMM dd, yyyy")</h3>
-
-        <!-- Loop through specific seizure details here in C# -->
-        @foreach (var seizure in _seizureActivityDetails)
+        @if (_seizureActivityDetails.Count > 0)
         {
-            var isTimeValid = DateTime.TryParse(seizure.SeizureTime, out DateTime seizureDate);
-            <EditForm Model="seizure" OnValidSubmit="() => HandleUpdate(seizure)">
-                <DataAnnotationsValidator/>
+            <!-- Loop through specific seizure details here in C# -->
+            foreach (var seizure in _seizureActivityDetails)
+            {
+                <EditForm Model="seizure" OnValidSubmit="() => HandleUpdate(seizure)">
+                    <DataAnnotationsValidator/>
 
-                <div class="log-entry mb-3 p-3 bg-dark border rounded">
-                    <!-- Seizure Type Field -->
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="flex-grow-1">
-                            @if (seizure.IsEditingType)
-                            {
-                                <InputSelect @bind-Value="seizure.SeizureType"
-                                             class="form-select form-select-sm bg-dark text-white">
-                                    <option value="Simple">Simple</option>
-                                    <option value="Complex">Complex</option>
-                                </InputSelect>
-                            }
-                            else
-                            {
-                                <span class="fw-bold text-info">@seizure.Type</span>
-                            }
+                    <div class="log-entry mb-3 p-3 bg-dark border rounded">
+                        <!-- Seizure Type Field -->
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="flex-grow-1">
+                                @if (seizure.IsEditingType)
+                                {
+                                    <InputSelect @bind-Value="seizure.SeizureType"
+                                                 class="form-select form-select-sm bg-dark text-white">
+                                        <option value="Simple">Simple</option>
+                                        <option value="Complex">Complex</option>
+                                    </InputSelect>
+                                }
+                                else
+                                {
+                                    <span class="fw-bold text-info">@seizure.SeizureType</span>
+                                }
+                            </div>
+                            <!-- Toggle Button: Acts as the Submit button when editing -->
+                            <button type="@(seizure.IsEditingType ? "submit" : "button")"
+                                    class="btn btn-sm text-info ms-2"
+                                    @onclick="() => ToggleTypeEdit(seizure)">
+                                <i class="bi @(seizure.IsEditingType ? "bi-check-lg" : "bi-pencil")"></i>
+                            </button>
                         </div>
-                        <!-- Toggle Button: Acts as the Submit button when editing -->
-                        <button type="@(seizure.IsEditingType ? "submit" : "button")"
-                                class="btn btn-sm text-info ms-2"
-                                @onclick="() => ToggleTypeEdit(seizure)">
-                            <i class="bi @(seizure.IsEditingType ? "bi-check-lg" : "bi-pencil")"></i>
-                        </button>
-                    </div>
 
-                    <!-- Comments Field -->
-                    <div class="d-flex align-items-start">
-                        <div class="flex-grow-1">
-                            @if (seizure.IsEditingComment)
-                            {
-                                <InputTextArea @bind-Value="seizure.Comment"
-                                               class="form-control form-control-sm bg-dark text-white" rows="2"/>
-                            }
-                            else
-                            {
-                                <p class="small text-secondary mb-0">@(seizure.Comment ?? "Add note...")</p>
-                            }
+                        <!-- Comments Field -->
+                        <div class="d-flex align-items-start">
+                            <div class="flex-grow-1">
+                                @if (seizure.IsEditingComment)
+                                {
+                                    <InputTextArea @bind-Value="seizure.Comments"
+                                                   class="form-control form-control-sm bg-dark text-white" rows="2"/>
+                                }
+                                else
+                                {
+                                    <p class="small text-secondary mb-0">@(seizure.Comments ?? "Add note...")</p>
+                                }
+                            </div>
+                            <button type="@(seizure.IsEditingComment ? "submit" : "button")"
+                                    class="btn btn-sm text-info ms-2"
+                                    @onclick="() => ToggleCommentEdit(seizure)">
+                                <i class="bi @(seizure.IsEditingComment ? "bi-check-lg" : "bi-pencil")"></i>
+                            </button>
                         </div>
-                        <button type="@(seizure.IsEditingComment ? "submit" : "button")"
-                                class="btn btn-sm text-info ms-2"
-                                @onclick="() => ToggleCommentEdit(seizure)">
-                            <i class="bi @(seizure.IsEditingComment ? "bi-check-lg" : "bi-pencil")"></i>
-                        </button>
                     </div>
-                </div>
-            </EditForm>
+                </EditForm>
+            }
         }
     </div>
 </div>
 
 @code {
-    [Parameter] public string Id { get; set; } = string.Empty;
+    [Parameter] public int Id { get; set; }
     [Parameter] public DateTime DisplayDate { get; set; }
 
     private DateTime _displayDate;
@@ -77,7 +79,42 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _seizureActivityDetails = await SeizureTrackerService.GetActivityDetailsByHeaderId();
+        _seizureActivityDetails = await SeizureTrackerService.GetActivityDetailsByHeaderId(Id);
+    }
+
+    private async Task ToggleTypeEdit(SeizureActivityDetail seizure)
+    {
+        seizure.IsEditingType = !seizure.IsEditingType;
+
+        if (!seizure.IsEditingType)
+        {
+            // Save to LocalStorage or API here
+            await LocalStorageHelper.SetItemAsync("Seizure Type", seizure.SeizureType);
+        }
+    }
+
+    private async Task ToggleCommentEdit(SeizureActivityDetail seizure)
+    {
+        seizure.IsEditingComment = !seizure.IsEditingType;
+
+        if (!seizure.IsEditingType)
+        {
+            // Save to LocalStorage or API here
+            await LocalStorageHelper.SetItemAsync("Comments", seizure.Comments);
+        }
+    }
+
+    private async Task HandleUpdate(SeizureActivityDetail seizure)
+    {
+        try
+        {
+            await SeizureTrackerService.PatchSeizureActivityDetail(seizure);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
     }
 
 }
