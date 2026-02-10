@@ -23,7 +23,7 @@
                         <!-- Seizure Type Field -->
                         <div class="d-flex align-items-center mb-2">
                             <div class="flex-grow-1">
-                                @if (seizure.IsEditingType)
+                                @if ((bool)seizure.IsEditingType)
                                 {
                                     <InputSelect @bind-Value="seizure.SeizureType"
                                                  class="form-select form-select-sm bg-dark text-white">
@@ -37,17 +37,17 @@
                                 }
                             </div>
                             <!-- Toggle Button: Acts as the Submit button when editing -->
-                            <button type="@(seizure.IsEditingType ? "submit" : "button")"
+                            <button type="@((bool)seizure.IsEditingType ? "submit" : "button")"
                                     class="btn btn-sm text-info ms-2"
                                     @onclick="() => ToggleTypeEdit(seizure)">
-                                <i class="bi @(seizure.IsEditingType ? "bi-check-lg" : "bi-pencil")"></i>
+                                <i class="bi @((bool)seizure.IsEditingType ? "bi-check-lg" : "bi-pencil")"></i>
                             </button>
                         </div>
 
                         <!-- Comments Field -->
                         <div class="d-flex align-items-start">
                             <div class="flex-grow-1">
-                                @if (seizure.IsEditingComment)
+                                @if ((bool)seizure.IsEditingComment)
                                 {
                                     <InputTextArea @bind-Value="seizure.Comments"
                                                    class="form-control form-control-sm bg-dark text-white" rows="2"/>
@@ -57,10 +57,10 @@
                                     <p class="small text-secondary mb-0">@(seizure.Comments ?? "Add note...")</p>
                                 }
                             </div>
-                            <button type="@(seizure.IsEditingComment ? "submit" : "button")"
+                            <button type="@((bool)seizure.IsEditingComment ? "submit" : "button")"
                                     class="btn btn-sm text-info ms-2"
                                     @onclick="() => ToggleCommentEdit(seizure)">
-                                <i class="bi @(seizure.IsEditingComment ? "bi-check-lg" : "bi-pencil")"></i>
+                                <i class="bi @((bool)seizure.IsEditingComment ? "bi-check-lg" : "bi-pencil")"></i>
                             </button>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
     {
         seizure.IsEditingType = !seizure.IsEditingType;
 
-        if (!seizure.IsEditingType)
+        if (!(bool)seizure?.IsEditingType)
         {
             // Save to LocalStorage or API here
             await LocalStorageHelper.SetItemAsync("Seizure Type", seizure.SeizureType);
@@ -97,7 +97,7 @@
     {
         seizure.IsEditingComment = !seizure.IsEditingType;
 
-        if (!seizure.IsEditingType)
+        if (!(bool)seizure?.IsEditingType)
         {
             // Save to LocalStorage or API here
             await LocalStorageHelper.SetItemAsync("Comments", seizure.Comments);
