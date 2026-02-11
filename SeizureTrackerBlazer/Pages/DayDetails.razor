@@ -10,8 +10,8 @@
             &laquo; Back to Archives
         </button>
 
-        <h3 class="page-title text-info">Logs for @DisplayDate.ToString("MMMM dd, yyyy")</h3>
-        @if (_seizureActivityDetails.Count > 0)
+        <h3 class="page-title text-info">Logs for @_seizureActivityDetails?.FirstOrDefault()?.SeizureDate</h3>
+        @if (_seizureActivityDetails?.Count > 0)
         {
             <!-- Loop through specific seizure details here in C# -->
             foreach (var seizure in _seizureActivityDetails)
@@ -20,6 +20,13 @@
                     <DataAnnotationsValidator/>
 
                     <div class="log-entry mb-3 p-3 bg-dark border rounded">
+                        <div class="d-flex justify-content-between align-items-center mb-2 border-bottom border-secondary pb-2">
+                            <span class="text-info fw-bold">
+                                <i class="bi bi-clock me-1"></i> 
+                                @seizure.SeizureTime
+                            </span>
+                            <span class="badge bg-secondary">Log ID: @seizure.SeizureId</span>
+                        </div>
                         <!-- Seizure Type Field -->
                         <div class="d-flex align-items-center mb-2">
                             <div class="flex-grow-1">
@@ -27,8 +34,10 @@
                                 {
                                     <InputSelect @bind-Value="seizure.SeizureType"
                                                  class="form-select form-select-sm bg-dark text-white">
-                                        <option value="Simple">Simple</option>
-                                        <option value="Complex">Complex</option>
+                                        @foreach (var name in SeizureTypeInputs.SeizureTypeNames)
+                                        {
+                                            <option value="@name">@name</option>
+                                        }
                                     </InputSelect>
                                 }
                                 else
@@ -82,13 +91,14 @@
 @code {
     [Parameter] public int Id { get; set; }
     [Parameter] public DateTime DisplayDate { get; set; }
-
-    private DateTime _displayDate;
+    
     private List<SeizureActivityDetail> _seizureActivityDetails = [];
 
     protected override async Task OnInitializedAsync()
     {
         _seizureActivityDetails = await SeizureTrackerService.GetActivityDetailsByHeaderId(Id);
+        
+        
     }
 
     private async Task ToggleTypeEdit(SeizureActivityDetail seizure)
