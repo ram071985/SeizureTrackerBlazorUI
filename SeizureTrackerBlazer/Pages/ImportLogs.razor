@@ -1,0 +1,80 @@
+@page "/import-logs"
+@attribute [Authorize]
+@inject ISeizureTrackerService SeizureTrackerService
+@inject NavigationManager Navigation
+
+<div class="app-screen">
+    <div class="content-container">
+        <button class="btn btn-outline-info btn-sm mb-3" @onclick="@(() => Navigation.NavigateTo("/log-archives"))">
+            &laquo; Back to Archives
+        </button>
+
+        <h3 class="page-title text-info">Import CSV Logs</h3>
+        <p class="text-secondary">Select a CSV file to bulk upload seizure records. 
+            <br /><small class="text-muted">Format: Date, Type, Comments</small>
+        </p>
+
+        <!-- Styled Upload Area -->
+        <div class="log-summary-entry shadow-sm mb-4" style="cursor: default;">
+            <div class="p-2">
+                <label for="csvUpload" class="form-label text-info small fw-bold">Choose CSV File</label>
+                <InputFile id="csvUpload" OnChange="HandleCsvUpload" class="form-control bg-dark text-white border-secondary" accept=".csv" />
+            </div>
+        </div>
+
+        @if (_isProcessing)
+        {
+            <div class="text-center mt-4">
+                <div class="spinner-border text-info" role="status"></div>
+                <p class="text-info mt-2">Processing file...</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private bool _isProcessing = false;
+
+    private async Task HandleCsvUpload(InputFileChangeEventArgs e)
+    {
+        _isProcessing = true;
+        try 
+        {
+            // Limit to 5MB for safety
+            using var reader = new StreamReader(e.File.OpenReadStream(5 * 1024 * 1024));
+            
+            // Skip Header
+            await reader.ReadLineAsync();
+
+            while (await reader.ReadLineAsync() is { } line)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                var cols = line.Split(',');
+
+                if (cols.Length >= 2) // Basic check for Date and Type
+                {
+                    var record = new SeizureActivityDetail
+                    {
+                        OccurredAt = DateTime.Parse(cols[0]),
+                        SeizureType = cols[1],
+                        Comments = cols.Length > 2 ? cols[2].Trim('"') : ""
+                    };
+
+                    await SeizureTrackerService.CreateSeizureDetail(record);
+                }
+            }
+
+            Navigation.NavigateTo("/log-archives");
+        }
+        catch (Exception ex)
+        {
+            // Fallback for your existing CSS validation-message style
+            Console.WriteLine($"Import Error: {ex.Message}");
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
+    }
+}
