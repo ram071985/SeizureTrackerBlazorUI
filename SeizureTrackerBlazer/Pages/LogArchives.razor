@@ -42,21 +42,30 @@
     <div class="content-container">
         <h3 class="page-title text-info">Seizure Log Archives</h3>
         <p class="text-secondary">Select a day to view detailed logs.</p>
-        @if (_headers.Count > 0)
+        @if (_isLoading)
         {
-            <!-- Loop through daily summaries here in C# -->
-            foreach (var header in _headers)
+            <div class="d-flex align-items-center justify-content-center">
+                <SpinnerComponent Color="text-info"></SpinnerComponent>
+            </div>
+        }
+        else
+        {
+            if (_headers.Count > 0)
             {
-                <!-- Make the entire div clickable and styled like a card -->
-                <div class="log-summary-entry shadow-sm" @onclick="() => NavigateToDay(header.Id)">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Date formatted cleanly -->
-                        <span class="log-date h5 mb-0">@header.Date</span>
+                <!-- Loop through daily summaries here in C# -->
+                foreach (var header in _headers)
+                {
+                    <!-- Make the entire div clickable and styled like a card -->
+                    <div class="log-summary-entry shadow-sm" @onclick="() => NavigateToDay(header.Id)">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Date formatted cleanly -->
+                            <span class="log-date h5 mb-0">@header.Date</span>
 
-                        <!-- Summary count on the right -->
-                        <span class="badge bg-info text-dark">@header?.DailyTotal Seizures</span>
+                            <!-- Summary count on the right -->
+                            <span class="badge bg-info text-dark">@header?.DailyTotal Seizures</span>
+                        </div>
                     </div>
-                </div>
+                }
             }
         }
     </div>

@@ -10,21 +10,21 @@ public partial class LogArchives : ComponentBase
     [Inject] private ISeizureTrackerService SeizureTrackerService { get; set; }
     
     private List<SeizureActivityHeader> _headers = [];
+    private bool _isLoading;
+    private ToasterConfig _toasterConfig;
 
     protected override async Task OnInitializedAsync()
     {
+        _isLoading = true;
+        
         _headers = await SeizureTrackerService.GetActivityHeaders();
+        
+        _isLoading = false;
     }
 
     private void NavigateToDay(int id)
     {
         // Pass the selected date to the detail page route
         Navigation.NavigateTo($"/day-details/{id}");
-    }
-
-    public class DailySummary
-    {
-        public DateTime Date { get; set; }
-        public int TotalSeizures { get; set; }
     }
 }

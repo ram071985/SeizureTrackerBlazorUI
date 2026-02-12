@@ -22,15 +22,13 @@
                 class="btn btn-outline-info btn-lg btn-seizure btn-neon btn-reflex my-3">Reflex
         </button>
     }
-    <ToasterComponent TextColor="@_toasterTextColor" BorderColor="@_toasterBorderColor" ToasterMessage="@_toasterMessage"></ToasterComponent>
+    <ToasterComponent ToasterConfig="@_toasterConfig"></ToasterComponent>
 </div>
 
 @code {
     private bool _submitting;
-    private string _toasterMessage;
     private string _loadingSpinnerColor;
-    private string _toasterBorderColor;
-    private string _toasterTextColor;
+    private ToasterConfig _toasterConfig;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,25 +58,21 @@
 
             _submitting = false;
 
-            _toasterBorderColor = "#28a745";
-            _toasterTextColor = "text-success";
-            _toasterMessage = $"{seizureLog.SeizureType} seizure recorded.";
+            _toasterConfig = new ToasterConfig("#28a745", "text-success", $"{seizureLog.SeizureType} seizure recorded.");
 
-            await ShowMyToast();
+            await ShowToast();
         }
         catch (Exception ex)
         {
-            _toasterBorderColor = "#dc3545";
-            _toasterTextColor = "text-danger";
-            _toasterMessage = $"Something went wrong while saving the log...";
-            
-            await ShowMyToast();
+            _toasterConfig = new ToasterConfig("#dc3545", "text-danger", $"Something went wrong while saving the log...");
+
+            await ShowToast();
 
             Console.WriteLine(ex);
         }
     }
 
-    private async Task ShowMyToast()
+    private async Task ShowToast()
     {
         try
         {
