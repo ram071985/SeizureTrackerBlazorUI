@@ -9,38 +9,47 @@
 @inject LocalStorageHelper LocalStorage
 
 <div class="container mt-5" style="max-width: 400px;">
-    <div class="card shadow-sm p-4 text-center border-0">
-        <h2 class="mb-4 text-primary">Seizure Tracker</h2>
-        <input type="text" autocomplete="username webauthn" style="display:none;"/>
-        <div class="form-group mb-3 text-start">
-            <label class="form-label">Email Address</label>
-            <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com"/>
-
-            <label class="form-label mt-2">Password</label>
-            <input type="password" @bind="_password" class="form-control form-control-lg"
-                   placeholder="Your secret password" autocomplete="current-password"/>
+    @if (_authLoading)
+    {
+        <div class="d-flex align-items-center justify-content-center">
+            <SpinnerComponent Color="text-info"></SpinnerComponent>
         </div>
+    }
+    else
+    {
+        <div class="card shadow-sm p-4 text-center border-0">
+            <h2 class="mb-4 text-primary">Seizure Tracker</h2>
+            <input type="text" autocomplete="username webauthn" style="display:none;"/>
+            <div class="form-group mb-3 text-start">
+                <label class="form-label">Email Address</label>
+                <input @bind="_email" class="form-control form-control-lg" placeholder="name@example.com"/>
 
-        <!-- Primary Password Login -->
-        <button @onclick="HandlePasswordLogin" class="btn btn-primary btn-lg w-100 py-3 mb-2">
-            <i class="bi bi-shield-lock me-2"></i> Login with Password
-        </button>
-        <div class="mt-4 border-top pt-3">
-            <p class="text-muted small mb-1">New here?</p>
-            <a href="/register" class="btn btn-outline-secondary btn-sm w-100">
-                Create a New Account
-            </a>
+                <label class="form-label mt-2">Password</label>
+                <input type="password" @bind="_password" class="form-control form-control-lg"
+                       placeholder="Your secret password" autocomplete="current-password"/>
+            </div>
+
+            <!-- Primary Password Login -->
+            <button @onclick="HandlePasswordLogin" class="btn btn-primary btn-lg w-100 py-3 mb-2">
+                <i class="bi bi-shield-lock me-2"></i> Login with Password
+            </button>
+            <div class="mt-4 border-top pt-3">
+                <p class="text-muted small mb-1">New here?</p>
+                <a href="/register" class="btn btn-outline-secondary btn-sm w-100">
+                    Create a New Account
+                </a>
+            </div>
+
+            <!-- Biometric Login (FaceID / TouchID) -->
+            <button @onclick="HandlePasskeyLogin" class="btn btn-outline-success btn-lg w-100 py-3 mb-3">
+                <i class="bi bi-person-badge me-2"></i> Login with FaceID
+            </button>
+
+            <p class="text-muted small">
+                New here? Log in with your password first to <a href="/manage-passkeys">enable biometrics</a>.
+            </p>
         </div>
-
-        <!-- Biometric Login (FaceID / TouchID) -->
-        <button @onclick="HandlePasskeyLogin" class="btn btn-outline-success btn-lg w-100 py-3 mb-3">
-            <i class="bi bi-person-badge me-2"></i> Login with FaceID
-        </button>
-
-        <p class="text-muted small">
-            New here? Log in with your password first to <a href="/manage-passkeys">enable biometrics</a>.
-        </p>
-    </div>
+    }
 </div>
 
 @code {
@@ -50,6 +59,7 @@
     private bool _isProcessing;
     private bool _hasTriggered = false;
     private bool _enableAutomaticPasskeyPrompt = true;
+    private bool _authLoading;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -75,7 +85,7 @@
                 Navigation.NavigateTo("/");
                 return;
             }
-            
+
             await Task.Delay(500);
 
             await TriggerImmediateBiometricPrompt();
@@ -86,6 +96,8 @@
 
     private async Task TriggerImmediateBiometricPrompt()
     {
+        _authLoading = true;
+
         if (!_enableAutomaticPasskeyPrompt) return;
         try
         {
@@ -144,6 +156,8 @@
             // We don't show an alert here because it's an 'auto' background task.
             // Let the user use the manual buttons instead.
         }
+
+        _authLoading = false;
     }
 
     private async Task HandlePasswordLogin()
