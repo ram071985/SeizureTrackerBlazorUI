@@ -55,7 +55,13 @@ public class SeizureTrackerService : ISeizureTrackerService
        
         try
         {
-            await _client.PostAsync(_route, new StringContent(body, System.Text.Encoding.UTF8, "application/json"));
+            var response = await _client.PostAsync(_route, new StringContent(body, System.Text.Encoding.UTF8, "application/json"));
+            
+            if(!response.IsSuccessStatusCode) 
+            {
+                // This manually triggers the catch block below
+                throw new HttpRequestException($"{response.Content.ReadAsStringAsync().Result}"); 
+            }
         }
         catch (Exception ex)
         {
@@ -75,11 +81,15 @@ public class SeizureTrackerService : ISeizureTrackerService
         
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         
-            await _client.PatchAsync(path, content);
+            var response = await _client.PatchAsync(path, content);
+            
+            if(!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"{response.Content.ReadAsStringAsync().Result}");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            
             throw;
         }
 
