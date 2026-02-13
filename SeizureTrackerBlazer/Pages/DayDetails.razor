@@ -127,7 +127,7 @@
             await SeizureTrackerService.PatchSeizureActivityDetail(seizure);
             
             
-            _toasterConfig = new ToasterConfig("#28a745", "text-success", $"{seizure.SeizureType} seizure recorded.");
+            _toasterConfig = new ToasterConfig("#28a745", "text-success", $"{seizure.SeizureType} seizure at {seizure.SeizureTime} was updated successfully.");
 
             await ShowToast();
         }
