@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace SeizureTrackerBlazer.Constants
 {
     internal static class UIConstants
@@ -16,7 +18,8 @@ namespace SeizureTrackerBlazer.Constants
     internal static class ApiEndpoints
     {
         internal const string GetHeaders = "headers";
-        internal const string GetDetailsByHeaderId = "details";
+        internal const string Details = "details";
+        internal const string LogDetails = "log-details";
     }
 
     internal static class MedChange
@@ -36,7 +39,7 @@ namespace SeizureTrackerBlazer.Constants
         internal const string HeatSensory = "Heat/Sensory";
         internal const string Anxiety = "Anxiety";
         internal const string MedicationChange = "Medication Change";
-        internal const string Reflex =  "Reflex";
+        internal const string Reflex = "Reflex";
         internal const string Simple = "Simple";
     }
 
@@ -87,5 +90,11 @@ namespace SeizureTrackerBlazer.Constants
     {
         internal const string SeizureType = "Enter 1 or more types";
         internal const string MedChange = "Enter yes or no";
+    }
+
+    internal static class SeizureTypeInputs
+    {
+        internal static readonly IReadOnlyList<string> SeizureTypeNames =
+            new List<string> { SeizureTypes.Simple, SeizureTypes.Complex, SeizureTypes.Reflex };
     }
 };

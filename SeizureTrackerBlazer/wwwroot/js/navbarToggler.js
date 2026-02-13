@@ -20,3 +20,11 @@ export function initializeToggler(togglerElement, collapseId, openClass) {
         });
     }
 }
+
+export function hideMenu(targetId) {
+    const menu = document.getElementById(targetId);
+    if (menu && menu.classList.contains('show')) {
+        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(menu);
+        bsCollapse.hide();
+    }
+}

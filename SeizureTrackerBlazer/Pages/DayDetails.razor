@@ -1,0 +1,156 @@
+@page "/day-details/{Id:int}"
+@attribute [Authorize]
+@inject NavigationManager Navigation
+@inject ISeizureTrackerService SeizureTrackerService
+@inject LocalStorageHelper LocalStorageHelper
+@inject IJSRuntime JSRuntime
+
+<div class="app-screen">
+    <div class="content-container">
+        <button class="btn btn-outline-info btn-sm mb-3" @onclick="@(() => Navigation.NavigateTo("/log-archives"))">
+            &laquo; Back to Archives
+        </button>
+
+        <h3 class="page-title text-info">Logs for @_seizureActivityDetails?.FirstOrDefault()?.SeizureDate</h3>
+        @if (_isLoading)
+        {
+            <div class="d-flex align-items-center justify-content-center">
+                <SpinnerComponent Color="text-info"></SpinnerComponent>
+            </div>
+        }
+        else
+        {
+            @if (_seizureActivityDetails?.Count > 0)
+            {
+                <!-- Loop through specific seizure details here in C# -->
+                foreach (var seizure in _seizureActivityDetails)
+                {
+                    <EditForm Model="seizure" OnValidSubmit="() => HandleUpdate(seizure)">
+                        <DataAnnotationsValidator/>
+
+                        <div class="log-entry mb-3 p-3 bg-dark border rounded">
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-2 border-bottom border-secondary pb-2">
+                            <span class="text-info fw-bold">
+                                <i class="bi bi-clock me-1"></i>
+                                @seizure.SeizureTime
+                            </span>
+                                <span class="badge bg-secondary">Log ID: @seizure.SeizureId</span>
+                            </div>
+                            <!-- Seizure Type Field -->
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="flex-grow-1">
+                                    @if (seizure.IsEditingType)
+                                    {
+                                        <InputSelect @bind-Value="seizure.SeizureType"
+                                                     class="form-select form-select-sm bg-dark text-white">
+                                            @foreach (var name in SeizureTypeInputs.SeizureTypeNames)
+                                            {
+                                                <option value="@name">@name</option>
+                                            }
+                                        </InputSelect>
+                                    }
+                                    else
+                                    {
+                                        <span class="fw-bold text-info">@seizure.SeizureType</span>
+                                    }
+                                </div>
+                                <!-- Toggle Button: Acts as the Submit button when editing -->
+                                <button type="button"
+                                        class="btn btn-sm text-info ms-2"
+                                        @onclick="() => seizure.IsEditingType = !seizure.IsEditingType">
+                                    <i class="bi @(seizure.IsEditingType ? "bi-check-lg" : "bi-pencil")"></i>
+                                </button>
+                            </div>
+
+                            <!-- Comments Field -->
+                            <div class="d-flex align-items-start">
+                                <div class="flex-grow-1">
+                                    @if (seizure.IsEditingComment)
+                                    {
+                                        <InputTextArea @bind-Value="seizure.Comments"
+                                                       class="form-control form-control-sm bg-dark text-white"
+                                                       rows="2"/>
+                                    }
+                                    else
+                                    {
+                                        <p class="small text-secondary mb-0">@(seizure.Comments ?? "Add note...")</p>
+                                    }
+                                </div>
+                                <button type="button"
+                                        class="btn btn-sm text-info ms-2"
+                                        @onclick="() => seizure.IsEditingComment = !seizure.IsEditingComment">
+                                    <i class="bi @(seizure.IsEditingComment ? "bi-check-lg" : "bi-pencil")"></i>
+                                </button>
+                            </div>
+                            <!-- THE SAVE BUTTON: Only shows if either field is being edited -->
+                            @if (seizure.IsEditingType || seizure.IsEditingComment)
+                            {
+                                <div class="mt-3 text-end">
+                                    <button type="submit" class="btn btn-info btn-sm">
+                                        <i class="bi bi-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </EditForm>
+                }
+            }
+        }
+    </div>
+    <ToasterComponent ToasterConfig="@_toasterConfig"></ToasterComponent>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public DateTime DisplayDate { get; set; }
+
+    private List<SeizureActivityDetail> _seizureActivityDetails = [];
+    private ToasterConfig _toasterConfig;
+    private bool _isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        _seizureActivityDetails = await SeizureTrackerService.GetActivityDetailsByHeaderId(Id);
+
+        _isLoading = false;
+    }
+
+    private async Task HandleUpdate(SeizureActivityDetail seizure)
+    {
+        _isLoading = true;
+
+        try
+        {
+            await SeizureTrackerService.PatchSeizureActivityDetail(seizure);
+            
+            
+            _toasterConfig = new ToasterConfig("#28a745", "text-success", $"{seizure.SeizureType} seizure recorded.");
+
+            await ShowToast();
+        }
+        catch (Exception ex)
+        {
+            _toasterConfig = new ToasterConfig("#dc3545", "text-danger", $"Something went wrong while updating the log...");
+
+            Console.WriteLine(ex.Message);
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task ShowToast()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("showToast", "liveToast");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+}

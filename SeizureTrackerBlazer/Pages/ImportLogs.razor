@@ -1,0 +1,134 @@
+@* @page "/import-logs" *@
+@* @using System.Globalization *@
+@* @attribute [Authorize] *@
+@* @inject ISeizureTrackerService SeizureTrackerService *@
+@* @inject NavigationManager Navigation *@
+@* *@
+@* <div class="app-screen"> *@
+@*     <div class="content-container"> *@
+@*         <button class="btn btn-outline-info btn-sm mb-3" @onclick="@(() => Navigation.NavigateTo("/log-archives"))"> *@
+@*             &laquo; Back to Archives *@
+@*         </button> *@
+@* *@
+@*         <h3 class="page-title text-info">Import CSV Logs</h3> *@
+@*         <p class="text-secondary">Select a CSV file to bulk upload seizure records. *@
+@*             <br/><small class="text-muted">Format: Date, Type, Comments</small> *@
+@*         </p> *@
+@* *@
+@*         <!-- Styled Upload Area --> *@
+@*         <div class="log-summary-entry shadow-sm mb-4" style="cursor: default;"> *@
+@*             <div class="p-2"> *@
+@*                 <label for="csvUpload" class="form-label text-info small fw-bold">Choose CSV File</label> *@
+@*                 <InputFile id="csvUpload" OnChange="HandleCsvUpload" *@
+@*                            class="form-control bg-dark text-white border-secondary" accept=".csv"/> *@
+@*             </div> *@
+@*         </div> *@
+@* *@
+@*         @if (_isProcessing) *@
+@*         { *@
+@*             <div class="text-center mt-4"> *@
+@*                 <div class="spinner-border text-info" role="status"></div> *@
+@*                 <p class="text-info mt-2">Processing file...</p> *@
+@*             </div> *@
+@*         } *@
+@*     </div> *@
+@*     <ToasterComponent TextColor="@_toasterTextColor" BorderColor="@_toasterBorderColor" *@
+@*                       ToasterMessage="@_toasterMessage"></ToasterComponent> *@
+@* </div> *@
+@* *@
+@* @code { *@
+@*     private bool _isProcessing = false; *@
+@*     private string _toasterMessage, _toasterTextColor, _toasterBorderColor, _loadingSpinnerColor; *@
+@* *@
+@*     private async Task HandleCsvUpload(InputFileChangeEventArgs e) *@
+@*     { *@
+@*         int currentRow = 0; *@
+@*         _isProcessing = true; *@
+@* *@
+@*         try *@
+@*         { *@
+@*             // Limit to 5MB for safety *@
+@*             using var reader = new StreamReader(e.File.OpenReadStream(5 * 1024 * 1024)); *@
+@* *@
+@*             while (await reader.ReadLineAsync() is { } line) *@
+@*             { *@
+@*                 currentRow++; *@
+@* *@
+@*                 if (string.IsNullOrWhiteSpace(line)) continue; *@
+@*                 if (currentRow == 1) continue; // Skip header row *@
+@* *@
+@* *@
+@*                 var cols = line.Split(','); *@
+@*                 // 1. Validate Column Count *@
+@*                 if (cols.Length < 3) *@
+@*                 { *@
+@*                     //   ToastService.ShowError($"Import Failed: Row {currentRow} is missing columns."); *@
+@*                     return; // QUIT THE ENTIRE FUNCTION *@
+@*                 } *@
+@* *@
+@* *@
+@*                 // var rawSimple = cols.ElementAtOrDefault(2); *@
+@*                 // var rawReflex = cols.ElementAtOrDefault(3); *@
+@*                 // var rawComplex = cols.ElementAtOrDefault(4); *@
+@*                 // var rawComments = cols.ElementAtOrDefault(5); *@
+@* *@
+@*                 var rawDate = cols[0].Trim(); *@
+@*                 if (!DateTime.TryParseExact(rawDate.Trim(), "M/d/yy", *@
+@*                         System.Globalization.CultureInfo.InvariantCulture, *@
+@*                         DateTimeStyles.AllowWhiteSpaces, *@
+@*                         out DateTime outputDate)) *@
+@*                 { *@
+@*                     // toast message *@
+@*                     return; *@
+@*                 } *@
+@* *@
+@*                 var rawTotal = cols[1].Trim(); *@
+@*                 if (!int.TryParse(rawTotal, out int total)) *@
+@*                 { *@
+@*                     return; *@
+@*                 } *@
+@* *@
+@*                 var rawSimple = cols[2].Trim(); *@
+@*                 if (!int.TryParse(rawSimple, out int simple)) *@
+@*                 { *@
+@*                     return; *@
+@*                 } *@
+@* *@
+@*                 var rawReflex = cols[3].Trim(); *@
+@*                 if (!int.TryParse(rawReflex, out int reflex)) *@
+@*                 { *@
+@*                     return; *@
+@*                 } *@
+@* *@
+@*                 var rawComplex = cols[4].Trim(); *@
+@*                 if (!int.TryParse(rawComplex, out int complex)) *@
+@*                 { *@
+@*                     return; *@
+@*                 } *@
+@* *@
+@*                 string? rawComments = cols[5].Trim(); *@
+@* *@
+@*                 var record = new SeizureActivityDetail *@
+@*                 { *@
+@*                     // SeizureDate = .ToString(), *@
+@*                     // SeizureType = cols[1], *@
+@*                     // Comments = cols.Length > 2 ? cols[2].Trim('"') : "" *@
+@*                 }; *@
+@* *@
+@*                 await SeizureTrackerService.CreateSeizureDetail(record); *@
+@*             } *@
+@* *@
+@*             Navigation.NavigateTo("/log-archives"); *@
+@*         } *@
+@*         catch (Exception ex) *@
+@*         { *@
+@*             // Fallback for your existing CSS validation-message style *@
+@*             Console.WriteLine($"Import Error: {ex.Message}"); *@
+@*         } *@
+@*         finally *@
+@*         { *@
+@*             _isProcessing = false; *@
+@*         } *@
+@*     } *@
+@* *@
+}

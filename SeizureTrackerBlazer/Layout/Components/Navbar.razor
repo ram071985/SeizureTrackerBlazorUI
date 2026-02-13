@@ -7,15 +7,21 @@
         <a class="navbar-brand fw-bold text-info" href="/">
             <i class="bi bi-activity me-2"></i>SeizureTracker
         </a>
-        <button @ref="_togglerElement" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navRes" 
+        <button @ref="@_togglerElement" class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navRes"
                 aria-controls="navRes" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navRes">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All" @onclick="CloseMenuAsync">
                         <i class="bi bi-house-door me-1"></i> Quick Log
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/log-archives" Match="NavLinkMatch.All" @onclick="CloseMenuAsync">
+                        <i class="bi bi-archive me-1"></i> Log Archives
                     </NavLink>
                 </li>
             </ul>
@@ -36,8 +42,7 @@
 @code {
     private ElementReference _togglerElement;
     private IJSObjectReference _module;
-    private void HandleLogout() => Navigation.NavigateTo("logout", forceLoad: true);
-    
+
     // Load the JavaScript module after the component is rendered
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -53,10 +58,36 @@
     // Clean up the JS reference when the component is disposed to prevent memory leaks
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        if (_module != null)
+        try
         {
-            await _module.DisposeAsync();
+            if (_module != null)
+            {
+                await _module.DisposeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
     }
+
+    private async Task CloseMenuAsync()
+    {
+        try
+        {
+            if (_module != null)
+            {
+                // Closes the menu programmatically via JS
+                await _module.InvokeVoidAsync("hideMenu", "navRes");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    private void HandleLogout() => Navigation.NavigateTo("logout", forceLoad: true);
+
 
 }

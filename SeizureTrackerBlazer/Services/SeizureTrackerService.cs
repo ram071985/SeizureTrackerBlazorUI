@@ -17,10 +17,11 @@ public class SeizureTrackerService : ISeizureTrackerService
 
     public async Task<List<SeizureActivityHeader>> GetActivityHeaders()
     {
-        var path = $"{_route}";
+        var path = $"{_route}/{ApiEndpoints.GetHeaders}";
+        
         try
         {
-            var response = await _client.GetAsync(ApiEndpoints.GetHeaders);
+            var response = await _client.GetAsync(path);
             
             return JsonSerializer.Deserialize<List<SeizureActivityHeader>>(await response.Content.ReadAsStringAsync());
         }
@@ -34,10 +35,10 @@ public class SeizureTrackerService : ISeizureTrackerService
     
     public async Task<List<SeizureActivityDetail>> GetActivityDetailsByHeaderId(int headerId)
     {
-        var uri = $"{ApiEndpoints.GetDetailsByHeaderId}/{headerId}";
+        var path = $"{_route}/{ApiEndpoints.Details}/{headerId}";
         try
         {
-            var response = await _client.GetAsync(uri);
+            var response = await _client.GetAsync(path);
             
             return JsonSerializer.Deserialize<List<SeizureActivityDetail>>(await response.Content.ReadAsStringAsync());
         }
@@ -62,5 +63,25 @@ public class SeizureTrackerService : ISeizureTrackerService
             
             throw;
         }
+    }
+
+    public async Task PatchSeizureActivityDetail(SeizureActivityDetail seizureActivityDetail)
+    {
+        var path = $"{_route}/{ApiEndpoints.LogDetails}";
+        
+        try
+        {
+            var json = JsonSerializer.Serialize(seizureActivityDetail);
+        
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        
+            await _client.PatchAsync(path, content);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+
     }
 }

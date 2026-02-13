@@ -9,19 +9,20 @@
 </div>
 
 @code {
-    private string _toasterMessage;
-    private string _borderColor;
-    private string _textColor;
-    
-    [Parameter] public string ToasterMessage { get; set; }
-    [Parameter] public string BorderColor { get; set; }
-    [Parameter] public string TextColor { get; set; }
+    private string? _toasterMessage;
+    private string? _borderColor;
+    private string? _textColor;
+
+    [Parameter] public string? ToasterMessage { get; set; }
+    [Parameter] public string? BorderColor { get; set; }
+    [Parameter] public string? TextColor { get; set; }
+    [Parameter] public ToasterConfig? ToasterConfig { get; set; }
 
     protected override void OnParametersSet()
     {
-        _toasterMessage = ToasterMessage;
-        _borderColor = $"border: 1px solid {BorderColor} !important";
-        _textColor = TextColor;
+        _toasterMessage = ToasterConfig?.Message;
+        _borderColor = $"border: 1px solid {ToasterConfig?.BorderColor} !important";
+        _textColor = ToasterConfig?.TextColor;
     }
 
 }

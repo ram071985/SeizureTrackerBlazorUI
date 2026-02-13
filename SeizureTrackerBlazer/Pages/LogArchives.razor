@@ -1,0 +1,73 @@
+@page "/log-archives"
+@* *@
+@* <div class="app-screen"> *@
+@*     <div class="content-container"> *@
+@*         <h3 class="page-title">Seizure Log Archives</h3> *@
+@*         <div class="log-entry"> *@
+@*             <div class="log-header-section"> *@
+@*                 <span class="log-date">Feb 7, 2026</span> *@
+@*                 <span class="log-time">10:30 AM</span> *@
+@*             </div> *@
+@*             <span class="seizure-type simple-type">Simple</span> *@
+@*             <div class="log-details-section"> *@
+@*                 <p>Duration: 30 seconds</p> *@
+@*                 <p>Trigger: Stress</p> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="log-entry"> *@
+@*             <div class="log-header-section"> *@
+@*                 <span class="log-date">Feb 5, 2026</span> *@
+@*                 <span class="log-time">02:15 PM</span> *@
+@*             </div> *@
+@*             <span class="seizure-type complex-type">Complex</span> *@
+@*             <div class="log-details-section"> *@
+@*                 <p>Duration: 2 minutes</p> *@
+@*                 <p>Trigger: Flashing lights</p> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="log-entry"> *@
+@*             <div class="log-header-section"> *@
+@*                 <span class="log-date">Feb 3, 2026</span> *@
+@*                 <span class="log-time">08:00 AM</span> *@
+@*             </div> *@
+@*             <span class="seizure-type reflex-type">Reflex</span> *@
+@*             <div class="log-details-section"> *@
+@*                 <p>Duration: 1 minute</p> *@
+@*                 <p>Trigger: Loud noise</p> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
+<div class="app-screen">
+    <div class="content-container">
+        <h3 class="page-title text-info">Seizure Log Archives</h3>
+        <p class="text-secondary">Select a day to view detailed logs.</p>
+        @if (_isLoading)
+        {
+            <div class="d-flex align-items-center justify-content-center">
+                <SpinnerComponent Color="text-info"></SpinnerComponent>
+            </div>
+        }
+        else
+        {
+            if (_headers.Count > 0)
+            {
+                <!-- Loop through daily summaries here in C# -->
+                foreach (var header in _headers)
+                {
+                    <!-- Make the entire div clickable and styled like a card -->
+                    <div class="log-summary-entry shadow-sm" @onclick="() => NavigateToDay(header.Id)">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Date formatted cleanly -->
+                            <span class="log-date h5 mb-0">@header.Date</span>
+
+                            <!-- Summary count on the right -->
+                            <span class="badge bg-info text-dark">@header?.DailyTotal Seizures</span>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+
