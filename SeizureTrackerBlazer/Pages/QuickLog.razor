@@ -41,8 +41,10 @@
         _submitting = true;
 
         SeizureActivityDetail seizureLog = new();
-
-        seizureLog.SeizureTime = DateTime.Now.ToUniversalTime().ToString();
+        
+        var seizureOccurence = DateTime.Now.ToUniversalTime().ToString();
+        seizureLog.SeizureDate = seizureOccurence;
+        seizureLog.SeizureTime = seizureOccurence;
 
         try
         {
@@ -56,8 +58,6 @@
 
             await StateContainer.AddSeizureActivityLog(seizureLog);
 
-            _submitting = false;
-
             _toasterConfig = new ToasterConfig("#28a745", "text-success", $"{seizureLog.SeizureType} seizure recorded.");
 
             await ShowToast();
@@ -70,6 +70,7 @@
 
             Console.WriteLine(ex);
         }
+        _submitting = false;
     }
 
     private async Task ShowToast()
