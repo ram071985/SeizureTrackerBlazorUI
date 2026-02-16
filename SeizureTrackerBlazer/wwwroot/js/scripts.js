@@ -1,3 +1,8 @@
+getUserTimeZone = () => {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // Returns "America/Chicago", "America/New_York", etc.
+}
+
 function showToast(toastElementId) {
     var toastEl = document.getElementById(toastElementId);
     if (toastEl) {
