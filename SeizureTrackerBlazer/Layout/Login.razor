@@ -66,15 +66,7 @@
         if (firstRender && !_hasTriggered)
         {
             _hasTriggered = true;
-
-            var hasVisited = await LocalStorage.GetItemAsync<bool>("hasVisited");
-
-            if (!hasVisited)
-            {
-                await LocalStorage.SetItemAsync("hasVisited", true);
-                return;
-            }
-
+            
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
