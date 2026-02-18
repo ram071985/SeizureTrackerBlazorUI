@@ -3,6 +3,7 @@
 @inject StateContainer StateContainer
 @inject IJSRuntime JSRuntime
 
+
 <div class="container log-button-container d-flex justify-content-center align-items-center flex-column py-5 my-5">
     @if (_submitting)
     {
@@ -41,10 +42,9 @@
         _submitting = true;
 
         SeizureActivityDetail seizureLog = new();
-        
-        var seizureOccurence = DateTime.Now.ToUniversalTime().ToString();
-        seizureLog.SeizureDate = seizureOccurence;
-        seizureLog.SeizureTime = seizureOccurence;
+
+        var seizureDate = DateTimeOffset.Now.ToString();
+        seizureLog.SeizureDate = seizureDate;
 
         try
         {
@@ -70,6 +70,7 @@
 
             Console.WriteLine(ex);
         }
+
         _submitting = false;
     }
 
