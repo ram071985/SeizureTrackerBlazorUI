@@ -12,6 +12,7 @@ public partial class LogArchives : ComponentBase
     private List<SeizureActivityHeader> _headers = [];
     private bool _isLoading;
     private ToasterConfig _toasterConfig;
+    private string? _displayDate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,7 +25,8 @@ public partial class LogArchives : ComponentBase
 
     private void NavigateToDay(int id)
     {
+        _displayDate = _headers.FirstOrDefault(h => h.Id == id)?.Date;
         // Pass the selected date to the detail page route
-        Navigation.NavigateTo($"/day-details/{id}");
+        Navigation.NavigateTo($"/day-details/{id}/{_displayDate}");
     }
 }
