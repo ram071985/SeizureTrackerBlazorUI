@@ -1,4 +1,4 @@
-@page "/day-details/{Id:int}"
+@page "/day-details/{Id:int}/{DisplayDate}"
 @attribute [Authorize]
 @inject NavigationManager Navigation
 @inject ISeizureTrackerService SeizureTrackerService
@@ -11,7 +11,7 @@
             &laquo; Back to Archives
         </button>
 
-        <h3 class="page-title text-info">Logs for @_seizureActivityDetails?.FirstOrDefault()?.SeizureDate</h3>
+        <h3 class="page-title text-info">Logs for @DisplayDate</h3>
         @if (_isLoading)
         {
             <div class="d-flex align-items-center justify-content-center">
@@ -103,7 +103,7 @@
 
 @code {
     [Parameter] public int Id { get; set; }
-    [Parameter] public DateTime DisplayDate { get; set; }
+    [Parameter] public string? DisplayDate { get; set; }
 
     private List<SeizureActivityDetail> _seizureActivityDetails = [];
     private ToasterConfig _toasterConfig;
